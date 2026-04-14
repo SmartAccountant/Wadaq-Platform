@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/components/LanguageContext";
 import { Button } from "@/components/ui/button";

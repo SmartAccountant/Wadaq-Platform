@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Upload, X, Loader2 } from 'lucide-react';
-import { Wadaq } from '@/api/WadaqClient';
+import { Wadaq } from '@/api/WadaqCore';
 import { useLanguage } from '@/components/LanguageContext';
 
 export default function ImageUpload({ 

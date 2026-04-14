@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Users, TrendingUp, DollarSign, Clock, Award, Download } from "lucide-react";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { useLanguage } from "@/components/LanguageContext";
 
 export default function CustomerPerformanceReport() {

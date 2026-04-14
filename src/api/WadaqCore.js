@@ -1,6 +1,5 @@
 /**
- * عميل محلي: تخزين في الذاكرة + sessionStorage للاستمرار بين التحديثات.
- * يوفّر entities موحّدة و functions.invoke وهمية للتطوير.
+ * نواة واجهة برنامج ودق المحاسبي: طبقة بيانات محلية (ذاكرة و sessionStorage) وكيانات موحّدة.
  */
 import { hashPasswordForAuth } from "../lib/authCrypto.js";
 

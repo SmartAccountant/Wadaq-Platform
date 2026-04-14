@@ -7,7 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLanguage } from "@/components/LanguageContext";

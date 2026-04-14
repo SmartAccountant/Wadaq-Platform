@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { isSubscriptionEffective } from "@/api/WadaqClient";
+import { isSubscriptionEffective } from "@/api/WadaqCore";
 import { createPageUrl } from "@/utils";
 import __Layout from "@/Layout.jsx";
 

@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Star, Send, CheckCircle } from "lucide-react";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { useLanguage } from "@/components/LanguageContext";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";

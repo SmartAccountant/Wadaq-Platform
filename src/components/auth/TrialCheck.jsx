@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Clock } from "lucide-react";

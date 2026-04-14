@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { useAuth } from "@/context/AuthContext";
 import {
   Table,

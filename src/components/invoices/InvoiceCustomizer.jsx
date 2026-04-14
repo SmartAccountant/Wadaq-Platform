@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Palette, AlignLeft, AlignCenter, AlignRight, Save, X, CheckCircle, Cloud } from "lucide-react";
 import { TEMPLATES } from "./InvoiceTemplates";
 import { Textarea } from "@/components/ui/textarea";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 
 const COLORS = [
   { name: "أزرق", value: "#2563eb" },

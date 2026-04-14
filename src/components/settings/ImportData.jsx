@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, FileSpreadsheet, Users, Package, CheckCircle2, AlertCircle, Loader2, Download } from "lucide-react";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { useLanguage } from "@/components/LanguageContext";
 import { Badge } from "@/components/ui/badge";
 

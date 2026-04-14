@@ -37,7 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { useAuth } from "@/context/AuthContext";
 // تم إزالة TrialCheck و AIChatbot لأنهما يسببان تعليق النظام
 import { useLanguage } from "@/components/LanguageContext";

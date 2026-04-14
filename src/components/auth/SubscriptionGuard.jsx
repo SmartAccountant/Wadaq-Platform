@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
 import { Link } from "react-router-dom";

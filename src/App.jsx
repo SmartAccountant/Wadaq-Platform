@@ -1,6 +1,4 @@
-/**
- * نقطة مسارات التطبيق الرئيسية (المشروع يستخدم App.jsx — لا يوجد App.tsx).
- */
+/** نقطة مسارات تطبيق ودق الرئيسية. */
 import { Toaster } from "@/components/ui/toaster";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClientInstance } from "@/lib/query-client";

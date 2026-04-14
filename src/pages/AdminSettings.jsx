@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { useAuth } from "@/context/AuthContext";
 import { hashPasswordForAuth } from "@/lib/authCrypto";
 import { Button } from "@/components/ui/button";

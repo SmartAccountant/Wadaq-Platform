@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { Calculator, ArrowLeft, RefreshCw, Copy, Check, ChevronDown } from "lucide-react";
 
 export default function VATCalculator() {

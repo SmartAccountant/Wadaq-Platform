@@ -19,7 +19,7 @@ export default function InvoicesList({ invoices = [], onView, onEdit, onDelete, 
   const [user, setUser] = React.useState(null);
 
   React.useEffect(() => {
-    import("@/api/WadaqClient").then(({ Wadaq }) => {
+    import("@/api/WadaqCore").then(({ Wadaq }) => {
       Wadaq.auth.me().then(setUser).catch(() => {});
     });
   }, []);

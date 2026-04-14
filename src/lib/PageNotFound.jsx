@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom';
-import { Wadaq } from '@/api/WadaqClient';
+import { Wadaq } from '@/api/WadaqCore';
 import { useQuery } from '@tanstack/react-query';
 
 

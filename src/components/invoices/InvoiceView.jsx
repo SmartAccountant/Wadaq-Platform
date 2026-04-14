@@ -5,7 +5,7 @@ import ThermalReceipt from "./ThermalReceipt";
 import CreditNoteView from "./CreditNoteView";
 import CreditNoteForm from "./CreditNoteForm";
 import InvoiceCustomizer, { DEFAULT_INVOICE_STYLE } from "./InvoiceCustomizer";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import {
   getOrCreateInvoiceZatcaQrDataUrl,
   getOrganizationVatForDisplay,

@@ -7,7 +7,7 @@ import { ar } from "date-fns/locale";
 import { useLanguage } from "@/components/LanguageContext";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 
 export default function ExportButtons({ invoices, expenses, period }) {
   const [isExporting, setIsExporting] = useState(false);

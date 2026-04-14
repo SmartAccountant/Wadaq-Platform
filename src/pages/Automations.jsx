@@ -18,7 +18,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { useLanguage } from "@/components/LanguageContext";
 
 export default function Automations() {

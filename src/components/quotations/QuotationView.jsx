@@ -6,7 +6,7 @@ import { ArrowLeft, FileText, Calendar, User, Phone, Mail, MapPin, Printer, Down
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useLanguage } from "@/components/LanguageContext";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { createPageUrl } from "@/utils";
 import { useNavigate } from "react-router-dom";

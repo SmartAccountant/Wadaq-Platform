@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Printer, Bluetooth, Wifi, Usb, Plus, Trash2, Check, X } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 
 export default function PrinterManager() {
   const { language } = useLanguage();

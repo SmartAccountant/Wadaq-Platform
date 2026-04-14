@@ -56,7 +56,7 @@ export default function QuotationForm({ quotation, customers = [], products = []
 
   const generateQuoteNumber = async () => {
     try {
-      const allQuotes = await import("@/api/WadaqClient").then(({ Wadaq }) => 
+      const allQuotes = await import("@/api/WadaqCore").then(({ Wadaq }) => 
         Wadaq.entities.Quotation.list("-created_date", 1)
       );
       

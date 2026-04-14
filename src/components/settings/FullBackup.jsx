@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { Download, Database, FileJson, FileSpreadsheet, Loader2, Package } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
 import * as XLSX from "xlsx";

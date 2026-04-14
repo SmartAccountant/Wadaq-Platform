@@ -5,7 +5,7 @@ import {
   paymentKeysAreLive,
   getMoyasarPublishableKey,
   moyasarPaymentModeFromKey,
-} from "@/api/WadaqClient";
+} from "@/api/WadaqCore";
 import { useAuth } from "@/context/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

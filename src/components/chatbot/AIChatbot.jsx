@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, X, Send, Loader2, History, Trash2, Download, Sparkles } from "lucide-react";

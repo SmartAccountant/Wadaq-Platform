@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Wadaq } from '../api/WadaqClient';
+import { Wadaq } from '../api/WadaqCore';
 
 export default function AIAssistant() {
   const [response, setResponse] = useState("");

@@ -63,7 +63,7 @@ export default function InvoiceForm({ invoice, customers = [], products = [], on
 
   const generateInvoiceNumber = async () => {
     try {
-      const allInvoices = await import("@/api/WadaqClient").then(({ Wadaq }) => 
+      const allInvoices = await import("@/api/WadaqCore").then(({ Wadaq }) => 
         Wadaq.entities.Invoice.list("-created_date", 1)
       );
       
@@ -186,7 +186,7 @@ export default function InvoiceForm({ invoice, customers = [], products = [], on
     
     // توليد بيانات ZATCA المطلوبة
     try {
-      const { Wadaq } = await import("@/api/WadaqClient");
+      const { Wadaq } = await import("@/api/WadaqCore");
       const user = await Wadaq.auth.me();
       const organizations = await Wadaq.entities.Organization.filter({ owner_email: user.email });
       const org = organizations[0];
@@ -284,7 +284,7 @@ export default function InvoiceForm({ invoice, customers = [], products = [], on
           if (product) {
             const newQuantity = (product.quantity || 0) - item.quantity;
             try {
-              const { Wadaq } = await import("@/api/WadaqClient");
+              const { Wadaq } = await import("@/api/WadaqCore");
               await Wadaq.entities.Product.update(item.product_id, {
                 quantity: Math.max(0, newQuantity)
               });

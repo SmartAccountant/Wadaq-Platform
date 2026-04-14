@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { Wadaq } from '@/api/WadaqClient';
+import { Wadaq } from '@/api/WadaqCore';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@Wadaq/sdk/dist/utils/axios-client';
 

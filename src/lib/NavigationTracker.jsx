@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import { Wadaq } from '@/api/WadaqClient';
+import { Wadaq } from '@/api/WadaqCore';
 import { pagesConfig } from '@/pages.config';
 
 export default function NavigationTracker() {

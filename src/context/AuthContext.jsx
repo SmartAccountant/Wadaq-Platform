@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { Wadaq, isSubscriptionEffective } from "@/api/WadaqClient";
+import { Wadaq, isSubscriptionEffective } from "@/api/WadaqCore";
 
 const AuthContext = createContext(null);
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, FileText, Users, Package, BarChart3, Sparkles, ArrowRight, ArrowLeft, Play, ChevronRight, Keyboard, CheckCircle2 } from "lucide-react";

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AppDemoAnimation from "@/components/landing/AppDemoAnimation";
 import { useNavigate } from "react-router-dom";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { Button } from "@/components/ui/button";
 import {
   Check, FileText, Bot, Zap, ArrowLeft, Shield, BarChart3,

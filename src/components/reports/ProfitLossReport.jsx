@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { TrendingUp, TrendingDown, DollarSign, Receipt, Wallet, Download } from "lucide-react";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { useLanguage } from "@/components/LanguageContext";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";

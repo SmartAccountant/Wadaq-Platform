@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Wadaq } from "@/api/WadaqClient";
+import { Wadaq } from "@/api/WadaqCore";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
