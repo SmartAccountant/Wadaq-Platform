@@ -1,0 +1,226 @@
+css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 96%;
+    --foreground: 220 30% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 30% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 15%;
+    --primary: 218 55% 22%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 94%;
+    --secondary-foreground: 220 30% 20%;
+    --muted: 210 20% 93%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 43 74% 49%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
+    --ring: 218 55% 22%;
+    --chart-1: 218 55% 28%;
+    --chart-2: 43 74% 49%;
+    --chart-3: 218 45% 45%;
+    --chart-4: 43 60% 65%;
+    --chart-5: 160 50% 40%;
+    --radius: 0.75rem;
+  }
+  .dark {
+    --background: 218 40% 10%;
+    --foreground: 210 40% 98%;
+    --card: 218 40% 13%;
+    --card-foreground: 210 40% 98%;
+    --popover: 218 40% 13%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 43 74% 49%;
+    --primary-foreground: 218 55% 15%;
+    --secondary: 218 35% 18%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 218 35% 18%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 43 74% 49%;
+    --accent-foreground: 218 55% 15%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 218 30% 22%;
+    --input: 218 30% 22%;
+    --ring: 43 74% 49%;
+    --chart-1: 43 74% 55%;
+    --chart-2: 218 55% 55%;
+    --chart-3: 43 60% 70%;
+    --chart-4: 160 50% 50%;
+    --chart-5: 218 40% 70%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply text-foreground;
+    font-family: 'Tajawal', 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+    background: #eef1f6;
+    min-height: 100vh;
+  }
+
+  /* Smooth transitions for all interactive elements */
+  a, button, [role="button"], input, select, textarea {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Clean card styling */
+  .card {
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.07);
+    box-shadow: 0 2px 12px rgba(30, 58, 100, 0.08);
+  }
+  
+  .btn-glow {
+    position: relative;
+    background: linear-gradient(135deg, #1e3a64 0%, #c9a227 100%);
+    box-shadow: 0 4px 15px rgba(30, 58, 100, 0.35);
+  }
+
+  .btn-glow-emerald {
+    background: linear-gradient(135deg, #1e3a64 0%, #2a5298 100%);
+    box-shadow: 0 4px 15px rgba(30, 58, 100, 0.3);
+  }
+  
+  /* Modern button styling */
+  button, [role="button"] {
+    @apply rounded-xl;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  
+  /* Input styling */
+  input, select, textarea {
+    @apply rounded-xl;
+    background: #fff;
+    color: #1a2a4a;
+    border-color: #d1dae8;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: #c9a227;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.15);
+  }
+
+  input::placeholder, select::placeholder, textarea::placeholder {
+    color: #94a3b8;
+  }
+  
+  /* Typography improvements */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cairo', 'Tajawal', 'IBM Plex Sans Arabic', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.3;
+  }
+  
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+  
+  p, span, div {
+    line-height: 1.7;
+  }
+  
+  .text-luxury {
+    font-weight: 300;
+    letter-spacing: 0.02em;
+  }
+  
+  .number-luxury {
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  
+  p, span, div {
+    line-height: 1.75;
+  }
+
+  /* Sidebar Custom Scrollbar */
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    margin: 4px 0;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: rgba(59, 130, 246, 0.5);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(59, 130, 246, 0.7);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  /* Firefox scrollbar */
+  .sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(59, 130, 246, 0.5) rgba(255, 255, 255, 0.05);
+  }
+  }
+
+/* Print Styles - controlled entirely by JavaScript inject */
+/* إزالة header/footer المتصفح (اسم الموقع والتاريخ) من جميع الطباعات */
+@page {
+  size: A4 portrait;
+  margin: 0 !important;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0 !important;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* إخفاء كل شيء - الإظهار يتم عبر JS */
+  body > *:not(#__inv_print_wrap__):not(#__voucher_print_wrap__) {
+    display: none !important;
+  }
+
+  #__inv_print_wrap__,
+  #__voucher_print_wrap__ {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: white !important;
+    z-index: 99999 !important;
+    padding: 12mm !important;
+  }
+
+  /* جداول */
+  table { border-collapse: collapse !important; }
+  tr { page-break-inside: avoid; }
+}
+
+/* Thermal print handled via JS - no CSS needed here */

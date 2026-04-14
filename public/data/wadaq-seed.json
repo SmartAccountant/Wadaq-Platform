@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "entities": {
+    "User": [],
+    "Invoice": [],
+    "Customer": [],
+    "Product": [],
+    "Expense": [],
+    "Quotation": [],
+    "PurchaseOrder": [],
+    "Supplier": [],
+    "Contract": [],
+    "CreditNote": [],
+    "Asset": [],
+    "Employee": [],
+    "Attendance": [],
+    "Payroll": [],
+    "JournalEntry": [],
+    "Organization": [],
+    "FounderSubscription": [],
+    "StockMovement": [],
+    "ProductBatch": [],
+    "ProductVariant": [],
+    "ProductReview": [],
+    "Notification": [],
+    "PaymentVoucher": [],
+    "ReceiptVoucher": [],
+    "CashAccount": [],
+    "RecurringInvoice": []
+  }
+}
