@@ -16,8 +16,6 @@ export default function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [companyVat, setCompanyVat] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const { refresh } = useAuth();
   const navigate = useNavigate();
@@ -44,13 +42,13 @@ export default function Signup() {
       await Wadaq.auth.signup({
         email,
         password,
-        name,
-        company_name: companyName,
-        company_vat_number: companyVat,
+        name: name.trim() || undefined,
+        company_name: "",
+        company_vat_number: "",
       });
       toast({
         title: "تم إنشاء الحساب",
-        description: "تم تفعيل فترة تجريبية 14 يوماً",
+        description: "يمكنك الآن استخدام النظام — فترة تجريبية عند التفعيل",
       });
       await afterAuth();
     } catch (err) {
@@ -72,7 +70,7 @@ export default function Signup() {
       await Wadaq.auth.loginWithGoogle({ credential: c });
       toast({
         title: "تم إنشاء / ربط الحساب",
-        description: "حساب جديد يحصل على 14 يوماً تجريبياً",
+        description: "حساب جديد يحصل على فترة تجريبية عند التفعيل",
       });
       await afterAuth();
     } catch (err) {
@@ -95,7 +93,7 @@ export default function Signup() {
       dir="rtl"
     >
       <div
-        className="w-full max-w-lg rounded-2xl shadow-2xl p-8 border"
+        className="w-full max-w-md rounded-2xl shadow-2xl p-8 border"
         style={{
           background: "rgba(255,255,255,0.98)",
           borderColor: "rgba(201,162,39,0.35)",
@@ -103,43 +101,27 @@ export default function Signup() {
       >
         <div className="text-center mb-6">
           <h1 className="text-2xl font-black mb-1" style={{ color: NAVY }}>
-            إنشاء حساب منشأة
+            إنشاء حساب جديد
           </h1>
           <p className="text-sm font-semibold" style={{ color: GOLD }}>
-            تجربة مجانية 14 يوماً تلقائياً
+            بالبريد الإلكتروني وكلمة المرور — أو عبر Google
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="co">اسم المنشأة *</Label>
+            <Label htmlFor="name">الاسم الكامل</Label>
             <Input
-              id="co"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
+              id="name"
+              autoComplete="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="مثال: أحمد محمد"
               required
-              placeholder="مثال: مؤسسة رِكاز"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="vat">الرقم الضريبي للمنشأة *</Label>
-            <Input
-              id="vat"
-              inputMode="numeric"
-              value={companyVat}
-              onChange={(e) => setCompanyVat(e.target.value.replace(/\D/g, "").slice(0, 15))}
-              required
-              placeholder="15 رقماً"
-              dir="ltr"
-              className="text-left"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="name">اسم المسؤول</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="الاسم الكامل" />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">البريد الإلكتروني *</Label>
+            <Label htmlFor="email">البريد الإلكتروني</Label>
             <Input
               id="email"
               type="email"
@@ -150,7 +132,7 @@ export default function Signup() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">كلمة المرور * (8 أحرف فأكثر)</Label>
+            <Label htmlFor="password">كلمة المرور (8 أحرف فأكثر)</Label>
             <Input
               id="password"
               type="password"
@@ -167,7 +149,7 @@ export default function Signup() {
             style={{ background: NAVY, borderBottom: `3px solid ${GOLD}` }}
             disabled={submitting}
           >
-            {submitting ? "جاري إنشاء الحساب…" : "تسجيل"}
+            {submitting ? "جاري إنشاء الحساب…" : "إنشاء الحساب"}
           </Button>
         </form>
 

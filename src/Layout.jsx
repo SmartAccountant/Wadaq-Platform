@@ -62,7 +62,6 @@ function LayoutContent({ children, currentPageName }) {
       icon: LayoutDashboard,
       items: [
         { name: t('dashboard'), page: "Dashboard", icon: LayoutDashboard },
-        { name: ar ? 'إعدادات الحساب' : 'Account settings', page: "Settings", icon: Settings },
         { name: ar ? 'الأسعار' : 'Pricing', page: "Pricing", icon: Tags },
         { name: ar ? '💳 الكاشير' : '💳 Cashier', page: "CashierSelection", icon: CreditCard },
       ]
@@ -268,9 +267,36 @@ function LayoutContent({ children, currentPageName }) {
       )}
       style={{ background: '#1a3a5c', borderRight: isRTL ? '3px solid #c9a227' : 'none', borderLeft: isRTL ? 'none' : '3px solid #c9a227' }}>
         <div className="flex flex-col h-full overflow-y-auto">
-          <div className="px-5 py-5" style={{ borderBottom: '1px solid rgba(201,162,39,0.3)' }}>
-            <p className="text-white font-black text-xl">برنامج ودق</p>
-            <p style={{ color: '#c9a227' }} className="text-xs">WADAQ SYSTEM</p>
+          <div
+            className="px-4 py-4 flex items-start gap-3 justify-between border-b"
+            style={{ borderColor: "rgba(201,162,39,0.3)" }}
+          >
+            <div className="min-w-0 flex-1">
+              <p className="text-white font-black text-xl leading-tight">برنامج ودق</p>
+              <p style={{ color: "#c9a227" }} className="text-[11px] tracking-wide mt-0.5">
+                WADAQ SYSTEM
+              </p>
+            </div>
+            {user ? (
+              <div
+                className="shrink-0 max-w-[55%] rounded-lg px-2 py-1.5 border text-left"
+                style={{
+                  borderColor: "rgba(201,162,39,0.22)",
+                  background: "rgba(0,0,0,0.15)",
+                }}
+                dir="ltr"
+                title={[user?.name, user?.email].filter(Boolean).join(" · ") || String(user?.id ?? "")}
+              >
+                <p className="text-[10px] font-medium text-slate-200 leading-snug truncate">
+                  {user?.name || user?.email || (ar ? "حساب مسجّل" : "Signed in")}
+                </p>
+                {user?.name && user?.email ? (
+                  <p className="text-[9px] text-slate-500 leading-snug truncate mt-0.5">
+                    {user.email}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
           <nav className="flex-1 p-3 space-y-1 min-h-0">
@@ -294,14 +320,23 @@ function LayoutContent({ children, currentPageName }) {
             ))}
           </nav>
 
-          <div className="p-4 border-t mt-auto" style={{ borderColor: "rgba(201,162,39,0.25)" }}>
-            <p className="text-xs text-slate-400 truncate" dir="ltr" title={user?.email}>
-              {user?.name || "—"} {user?.email ? `· ${user.email}` : ""}
-            </p>
+          <div className="p-4 border-t mt-auto space-y-1" style={{ borderColor: "rgba(201,162,39,0.25)" }}>
+            <Link
+              to={createPageUrl("Settings")}
+              className={cn(
+                "flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                currentPageName === "Settings"
+                  ? "bg-white/10 text-white"
+                  : "text-slate-400 hover:bg-white/5 hover:text-white"
+              )}
+            >
+              <Settings className="w-4 h-4 shrink-0 opacity-80" />
+              <span className="font-medium">{ar ? "الإعدادات" : "Settings"}</span>
+            </Link>
             <Button
               type="button"
               variant="ghost"
-              className="w-full mt-2 justify-start gap-2 text-amber-100/90 hover:text-white hover:bg-white/10"
+              className="w-full justify-start gap-2 text-amber-100/90 hover:text-white hover:bg-white/10"
               onClick={handleLogout}
             >
               <LogOut className="w-4 h-4" />

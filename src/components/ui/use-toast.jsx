@@ -2,7 +2,10 @@
 import { useState, useEffect } from "react";
 
 const TOAST_LIMIT = 20;
-const TOAST_REMOVE_DELAY = 1000000;
+/** زمن إزالة العنصر من الحالة بعد الإغلاق (للمزامنة مع أنيميشن الخروج) */
+const TOAST_REMOVE_DELAY = 1000;
+/** مدة ظهور التنبيه قبل الإغلاق التلقائي (ميلي ثانية) */
+const TOAST_DURATION_MS = 3000;
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
@@ -19,6 +22,15 @@ function genId() {
 }
 
 const toastTimeouts = new Map();
+const autoDismissTimeouts = new Map();
+
+const clearAutoDismiss = (toastId) => {
+  const t = autoDismissTimeouts.get(toastId);
+  if (t) {
+    clearTimeout(t);
+    autoDismissTimeouts.delete(toastId);
+  }
+};
 
 const addToRemoveQueue = (toastId) => {
   if (toastTimeouts.has(toastId)) {
@@ -66,9 +78,11 @@ export const reducer = (state, action) => {
       // ! Side effects ! - This could be extracted into a dismissToast() action,
       // but I'll keep it here for simplicity
       if (toastId) {
+        clearAutoDismiss(toastId);
         addToRemoveQueue(toastId);
       } else {
         state.toasts.forEach((toast) => {
+          clearAutoDismiss(toast.id);
           addToRemoveQueue(toast.id);
         });
       }
@@ -110,8 +124,12 @@ function dispatch(action) {
   });
 }
 
-function toast({ ...props }) {
+function toast({ duration: durationProp, ...props }) {
   const id = genId();
+  const duration =
+    durationProp === undefined
+      ? TOAST_DURATION_MS
+      : durationProp;
 
   const update = (props) =>
     dispatch({
@@ -127,12 +145,22 @@ function toast({ ...props }) {
     toast: {
       ...props,
       id,
+      duration,
       open: true,
       onOpenChange: (open) => {
         if (!open) dismiss();
       },
     },
   });
+
+  if (
+    typeof duration === "number" &&
+    duration > 0 &&
+    Number.isFinite(duration)
+  ) {
+    const tid = setTimeout(dismiss, duration);
+    autoDismissTimeouts.set(id, tid);
+  }
 
   return {
     id,

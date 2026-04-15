@@ -151,7 +151,7 @@ export default function Login() {
         <p className="text-center text-sm text-slate-600 mt-6">
           ليس لديك حساب؟{" "}
           <Link to="/signup" className="font-bold" style={{ color: NAVY }}>
-            إنشاء حساب
+            إنشاء حساب جديد
           </Link>
         </p>
       </div>

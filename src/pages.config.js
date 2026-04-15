@@ -14,7 +14,6 @@ import Dashboard from './pages/Dashboard';
 import Expenses from './pages/Expenses';
 import Inventory from './pages/Inventory';
 import Invoices from './pages/Invoices';
-import Landing from './pages/Landing';
 import POS from './pages/POS';
 import PaymentAdmin from './pages/PaymentAdmin';
 import Products from './pages/Products';
@@ -53,7 +52,6 @@ export const PAGES = {
     "Expenses": Expenses,
     "Inventory": Inventory,
     "Invoices": Invoices,
-    "Landing": Landing,
     "POS": POS,
     "PaymentAdmin": PaymentAdmin,
     "Products": Products,
@@ -78,7 +76,7 @@ export const PAGES = {
 }
 
 export const pagesConfig = {
-    mainPage: "Dashboard", // تم التغيير من Landing إلى Dashboard لفتح النظام فوراً
+    mainPage: "Dashboard", // الصفحة الافتراضية بعد تسجيل الدخول — الهبوط العام على /
     Pages: PAGES,
     Layout: __Layout,
 };

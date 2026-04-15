@@ -18,7 +18,7 @@ import AdminPaymentLogs from "@/pages/AdminPaymentLogs";
 import PaymentInvoice from "@/pages/PaymentInvoice";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import About from "@/pages/About";
-import Landing from "@/pages/Landing";
+import HomeEntry from "@/components/HomeEntry";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
 import RefundPolicy from "@/pages/RefundPolicy";
@@ -26,8 +26,7 @@ import Checkout from "@/pages/Checkout";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/components/LanguageContext";
 
-const { Pages, mainPage } = pagesConfig;
-const mainPageKey = mainPage ?? Object.keys(Pages)[0];
+const { Pages } = pagesConfig;
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
@@ -57,12 +56,12 @@ function AppRoutes() {
       <Route path="/About" element={<Navigate to="/about" replace />} />
 
       <Route path="/VATCalculator" element={<VATCalculator />} />
-      <Route path="/Landing" element={<Landing />} />
+      <Route path="/" element={<HomeEntry />} />
+      <Route path="/Landing" element={<Navigate to="/" replace />} />
 
       <Route path="/pricing" element={<Navigate to="/Pricing" replace />} />
 
       <Route element={<AuthSubscriptionLayout />}>
-        <Route path="/" element={<Navigate to={`/${mainPageKey}`} replace />} />
         {Object.entries(Pages).map(([path, Page]) => (
           <Route key={path} path={`/${path}`} element={<Page />} />
         ))}
