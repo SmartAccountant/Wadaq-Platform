@@ -24,6 +24,7 @@ import Privacy from "@/pages/Privacy";
 import RefundPolicy from "@/pages/RefundPolicy";
 import Checkout from "@/pages/Checkout";
 import Footer from "@/components/Footer";
+import WadaqAIChatFAB from "@/components/wadaq-ai/WadaqAIChatFAB";
 import { LanguageProvider } from "@/components/LanguageContext";
 
 const { Pages } = pagesConfig;
@@ -91,6 +92,7 @@ function App() {
                 <div className="flex-1 w-full min-w-0">
                   <AppRoutes />
                 </div>
+                <WadaqAIChatFAB />
                 <Footer />
               </div>
             </Router>
