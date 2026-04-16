@@ -2,11 +2,14 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { MessageCircle, Send, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { hybridChat } from "@/lib/wadaqAi/hybridChat";
+import { useLanguage } from "@/components/LanguageContext";
+import { cn } from "@/lib/utils";
 
 const NAVY = "#1a3a5c";
 const GOLD = "#c9a227";
 
 export default function WadaqAIChatFAB() {
+  const { isRTL } = useLanguage();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -55,13 +58,20 @@ export default function WadaqAIChatFAB() {
     }
   }, [input, loading, messages]);
 
+  /** زر عائم في زاوية منطقة المحتوى (بعيداً عن الشريط الجانبي): RTL → أسفل يسار الشاشة، LTR → أسفل يمين */
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[100] flex justify-start p-4 sm:p-6" dir="rtl">
-      <div className="pointer-events-auto flex w-full max-w-md flex-col items-start gap-3">
+    <div
+      className={cn(
+        "fixed z-[35] flex max-w-[calc(100vw-1rem)] flex-col gap-2 p-3 sm:bottom-5 sm:p-4",
+        isRTL ? "bottom-16 left-3 items-start sm:bottom-5 sm:left-5" : "bottom-16 right-3 items-end sm:bottom-5 sm:right-5"
+      )}
+      dir="rtl"
+    >
+      <div className="flex w-full max-w-[min(100%,22rem)] flex-col gap-2">
         {open && (
           <div
-            className="w-full overflow-hidden rounded-2xl border bg-white shadow-2xl"
-            style={{ borderColor: "rgba(26,58,92,0.2)", maxHeight: "min(70vh, 520px)" }}
+            className="w-full overflow-hidden rounded-2xl border bg-white shadow-xl"
+            style={{ borderColor: "rgba(26,58,92,0.2)", maxHeight: "min(65vh, 480px)" }}
           >
             <div
               className="flex items-center justify-between gap-2 border-b px-4 py-3 text-white"
@@ -69,7 +79,7 @@ export default function WadaqAIChatFAB() {
             >
               <div>
                 <p className="font-bold text-sm">مساعد ودق الذكي</p>
-                <p className="text-[10px] opacity-90">خبير محاسبي — عربي كامل</p>
+                <p className="text-[10px] opacity-90">دعم مهني — واجهة عربية كاملة</p>
               </div>
               <Button
                 type="button"
@@ -93,8 +103,8 @@ export default function WadaqAIChatFAB() {
                   className="rounded-xl border bg-slate-50 px-3 py-3 text-slate-700"
                   style={{ borderColor: "rgba(26,58,92,0.12)" }}
                 >
-                  <p className="leading-relaxed">
-                    مرحباً، أنا <strong>مساعد ودق الذكي</strong> — خبير محاسبي لبرنامج ودق. اسألني عن الفوترة، الضريبة، التقارير، أو أي استفسار عام.
+                  <p className="leading-relaxed text-slate-800">
+                    مساعد ودق الذكي — خبير محاسبي في إطار منصّة ودق المحاسبية. يمكنكم الاستفسار عن الفوترة الإلكترونية، الضريبة والتقارير، والميزات التشغيلية، وفق الأنظمة والممارسات المعمول بها في المملكة.
                   </p>
                 </div>
               )}
@@ -161,8 +171,8 @@ export default function WadaqAIChatFAB() {
                   <Send className="h-4 w-4" />
                 </Button>
               </div>
-              <p className="mt-2 text-[10px] text-slate-400">
-                للاستفسارات المحاسبية المعقّدة يُستخدم OpenAI تلقائياً عند توفر المفتاح؛ التحيات والعامة عبر Grok لتوفير التكلفة.
+              <p className="mt-2 text-[10px] text-slate-400 leading-relaxed">
+                تُوجَّه الاستفسارات المحاسبية المعمّقة إلى نموذج متخصص عند توفر الربط؛ وتُعالَج الاستفسارات العامة عبر مسار مُختصر لتحسين الكفاءة التشغيلية.
               </p>
             </div>
           </div>
@@ -171,18 +181,18 @@ export default function WadaqAIChatFAB() {
         <Button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="h-14 w-14 rounded-full p-0 shadow-xl"
+          className="h-11 w-11 shrink-0 rounded-full p-0 shadow-md"
           style={{
-            background: `linear-gradient(145deg, ${NAVY}, ${NAVY})`,
+            background: NAVY,
             border: `2px solid ${GOLD}`,
-            boxShadow: "0 8px 24px rgba(26,58,92,0.35)",
+            boxShadow: "0 4px 14px rgba(26,58,92,0.28)",
           }}
           aria-label={open ? "إغلاق مساعد ودق" : "فتح مساعد ودق الذكي"}
         >
           {open ? (
-            <X className="h-6 w-6 text-white" />
+            <X className="h-5 w-5 text-white" />
           ) : (
-            <MessageCircle className="h-7 w-7 text-white" />
+            <MessageCircle className="h-5 w-5 text-white" />
           )}
         </Button>
       </div>

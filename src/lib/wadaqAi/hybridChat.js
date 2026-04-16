@@ -14,7 +14,10 @@ const MISSING_OPENAI =
 export async function hybridChat(userMessage, history = []) {
   const trimmed = String(userMessage || "").trim();
   if (!trimmed) {
-    return { text: "اكتب سؤالك وسأساعدك كخبير محاسبي لبرنامج ودق.", engine: "grok" };
+    return {
+      text: "يُرجى إدخال الاستفسار وسيتم الردّ وفق الإطار المهني لمنصّة ودق المحاسبية.",
+      engine: "grok",
+    };
   }
 
   const engine = decideEngine(trimmed);

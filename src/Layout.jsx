@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "./utils";
 import { 
         LayoutDashboard, 
@@ -49,6 +49,7 @@ function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, refresh } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [openSections, setOpenSections] = React.useState({});
   const { t, toggleLanguage, language, isRTL } = useLanguage();
 
@@ -234,8 +235,7 @@ function LayoutContent({ children, currentPageName }) {
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;600;700&family=Cairo:wght@300;400;500;600;700;800&display=swap');
-        body { font-family: 'Tajawal', 'Cairo', sans-serif; background: #eef1f6; }
+        body { background: #eef1f6; font-family: "Tajawal", system-ui, sans-serif; }
         .page-transition { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
@@ -266,9 +266,9 @@ function LayoutContent({ children, currentPageName }) {
         sidebarOpen ? "translate-x-0" : isRTL ? "translate-x-full lg:translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}
       style={{ background: '#1a3a5c', borderRight: isRTL ? '3px solid #c9a227' : 'none', borderLeft: isRTL ? 'none' : '3px solid #c9a227' }}>
-        <div className="flex flex-col h-full overflow-y-auto">
+        <div className="flex h-full min-h-0 max-h-[100dvh] flex-col" style={{ fontFamily: '"Tajawal", system-ui, sans-serif' }}>
           <div
-            className="px-4 py-4 flex items-start gap-3 justify-between border-b"
+            className="flex shrink-0 items-start justify-between gap-3 border-b px-4 py-3"
             style={{ borderColor: "rgba(201,162,39,0.3)" }}
           >
             <div className="min-w-0 flex-1">
@@ -299,18 +299,38 @@ function LayoutContent({ children, currentPageName }) {
             ) : null}
           </div>
 
-          <nav className="flex-1 p-3 space-y-1 min-h-0">
+          <nav
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-2"
+            aria-label={ar ? "القائمة الرئيسية" : "Main navigation"}
+          >
+            <div className="flex flex-col gap-2">
             {navSections.map((section) => (
-                <div key={section.key}>
-                    <button onClick={() => toggleSection(section.key)} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:text-white hover:bg-white/5">
-                        <section.icon className="w-5 h-5" />
-                        <span className="font-bold flex-1 text-right">{section.label}</span>
-                        <ChevronDown className="w-4 h-4" />
+                <div key={section.key} className="rounded-xl border border-transparent">
+                    <button
+                      type="button"
+                      onClick={() => toggleSection(section.key)}
+                      className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
+                    >
+                        <section.icon className="h-5 w-5 shrink-0 opacity-90" />
+                        <span className="flex-1 text-right text-sm font-semibold leading-snug">{section.label}</span>
+                        <ChevronDown
+                          className={cn(
+                            "h-4 w-4 shrink-0 opacity-70 transition-transform duration-200",
+                            openSections[section.key] && "rotate-180"
+                          )}
+                        />
                     </button>
                     {openSections[section.key] && (
-                        <div className="pr-4 space-y-1">
+                        <div className="mt-1 space-y-0.5 border-t border-white/5 px-2 pb-2 pt-1">
                             {section.items.map(item => (
-                                <Link key={item.page + (item.to || "")} to={item.to || createPageUrl(item.page)} className="block px-4 py-2 text-sm text-slate-400 hover:text-white">
+                                <Link
+                                  key={item.page + (item.to || "")}
+                                  to={item.to || createPageUrl(item.page)}
+                                  className={cn(
+                                    "block rounded-lg px-3 py-2 text-sm leading-snug text-slate-400 transition-colors hover:bg-white/5 hover:text-white",
+                                    (item.to ? location.pathname === item.to : currentPageName === item.page) && "bg-white/10 text-white"
+                                  )}
+                                >
                                     {item.name}
                                 </Link>
                             ))}
@@ -318,9 +338,10 @@ function LayoutContent({ children, currentPageName }) {
                     )}
                 </div>
             ))}
+            </div>
           </nav>
 
-          <div className="p-4 border-t mt-auto space-y-1" style={{ borderColor: "rgba(201,162,39,0.25)" }}>
+          <div className="shrink-0 space-y-1 border-t bg-[#152f4d] p-3" style={{ borderColor: "rgba(201,162,39,0.25)" }}>
             <Link
               to={createPageUrl("Settings")}
               className={cn(
