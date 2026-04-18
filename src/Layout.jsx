@@ -273,6 +273,25 @@ function LayoutContent({ children, currentPageName }) {
         }
         .page-transition { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        /* شريط تمرير باهت بنفس نغمة الشريط الجانبي */
+        .sidebar-nav-scroll {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255,255,255,0.14) rgba(0,0,0,0.12);
+        }
+        .sidebar-nav-scroll::-webkit-scrollbar {
+          width: 5px;
+        }
+        .sidebar-nav-scroll::-webkit-scrollbar-track {
+          background: rgba(0,0,0,0.12);
+          border-radius: 9999px;
+        }
+        .sidebar-nav-scroll::-webkit-scrollbar-thumb {
+          background: rgba(255,255,255,0.14);
+          border-radius: 9999px;
+        }
+        .sidebar-nav-scroll::-webkit-scrollbar-thumb:hover {
+          background: rgba(255,255,255,0.22);
+        }
       `}</style>
 
       {/* Mobile Header */}
@@ -335,7 +354,7 @@ function LayoutContent({ children, currentPageName }) {
           </div>
 
           <nav
-            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-2"
+            className="sidebar-nav-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-2"
             aria-label={ar ? "القائمة الرئيسية" : "Main navigation"}
           >
             <div className="flex min-h-0 flex-col gap-2 pb-1">
@@ -379,38 +398,20 @@ function LayoutContent({ children, currentPageName }) {
               className="mt-2 space-y-2 border-t bg-[#152f4d] p-3"
               style={{ borderColor: "rgba(201,162,39,0.25)" }}
             >
-              <div className="space-y-1.5" role="group" aria-label={t("language_label")}>
-                <div className="flex items-center gap-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                  <Languages className="h-3.5 w-3.5 opacity-80" />
-                  {t("language_label")}
-                </div>
-                <div className="flex rounded-lg bg-black/30 p-1 gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setLanguage("ar")}
-                    className={cn(
-                      "flex-1 rounded-md py-2 text-xs font-bold transition-colors",
-                      language === "ar"
-                        ? "bg-white/20 text-white shadow-sm"
-                        : "text-slate-400 hover:bg-white/10 hover:text-slate-200"
-                    )}
-                  >
-                    {t("language_ar")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLanguage("en")}
-                    className={cn(
-                      "flex-1 rounded-md py-2 text-xs font-bold transition-colors",
-                      language === "en"
-                        ? "bg-white/20 text-white shadow-sm"
-                        : "text-slate-400 hover:bg-white/10 hover:text-slate-200"
-                    )}
-                  >
-                    {t("language_en")}
-                  </button>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
+                className={cn(
+                  "flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "text-slate-400 hover:bg-white/5 hover:text-white"
+                )}
+                aria-label={language === "ar" ? t("language_en") : t("language_ar")}
+              >
+                <Languages className="h-4 w-4 shrink-0 opacity-80" />
+                <span className="flex-1 text-start">
+                  {language === "ar" ? t("language_en") : t("language_ar")}
+                </span>
+              </button>
               <Link
                 to={createPageUrl("Pricing")}
                 className={cn(

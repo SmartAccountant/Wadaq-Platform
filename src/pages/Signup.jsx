@@ -96,36 +96,18 @@ export default function Signup() {
       }}
       dir={isRTL ? "rtl" : "ltr"}
     >
-      <div
+      <button
+        type="button"
+        onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
         className={cn(
-          "absolute top-4 flex items-center gap-2 rounded-xl border border-white/15 bg-black/20 px-2 py-1.5 backdrop-blur-sm",
+          "absolute top-4 flex items-center gap-2 rounded-xl border border-white/15 bg-black/20 px-3 py-2 text-xs font-bold text-slate-200 backdrop-blur-sm hover:bg-white/10 hover:text-white",
           isRTL ? "left-4" : "right-4"
         )}
-        role="group"
-        aria-label={t("language_label")}
+        aria-label={language === "ar" ? t("language_en") : t("language_ar")}
       >
         <Languages className="h-4 w-4 text-amber-200/90" />
-        <button
-          type="button"
-          onClick={() => setLanguage("ar")}
-          className={cn(
-            "rounded-lg px-2.5 py-1 text-xs font-bold",
-            language === "ar" ? "bg-white/20 text-white" : "text-slate-300 hover:bg-white/10"
-          )}
-        >
-          {t("language_ar")}
-        </button>
-        <button
-          type="button"
-          onClick={() => setLanguage("en")}
-          className={cn(
-            "rounded-lg px-2.5 py-1 text-xs font-bold",
-            language === "en" ? "bg-white/20 text-white" : "text-slate-300 hover:bg-white/10"
-          )}
-        >
-          {t("language_en")}
-        </button>
-      </div>
+        {language === "ar" ? t("language_en") : t("language_ar")}
+      </button>
 
       <div
         className="w-full max-w-md rounded-2xl shadow-2xl p-8 border"
