@@ -71,7 +71,7 @@ export default function SubscriptionGuard({ children }) {
             </p>
           </div>
           <div className="flex flex-col gap-2">
-            <Link to={createPageUrl("Subscription")}>
+            <Link to={createPageUrl("Pricing")}>
               <Button className="w-full bg-slate-900 hover:bg-slate-700 text-white">
                 {language === 'ar' ? 'عرض الباقات' : 'View Plans'}
               </Button>

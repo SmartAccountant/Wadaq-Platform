@@ -315,7 +315,7 @@ export default function InvoiceForm({ invoice, customers = [], products = [], on
 
   const handleCancel = () => {
     if (formData.items.length > 0 || formData.customer_name) {
-      if (confirm('هل أنت متأكد من إلغاء الفاتورة؟ سيتم فقدان جميع البيانات المدخلة.')) {
+      if (confirm(t("confirm_cancel_invoice"))) {
         onCancel();
       }
     } else {

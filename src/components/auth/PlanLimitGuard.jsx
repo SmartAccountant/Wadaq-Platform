@@ -86,7 +86,7 @@ export default function PlanLimitGuard({ plan, limitType, currentCount, children
             </div>
           </div>
 
-          <Link to={createPageUrl('Subscription')}>
+          <Link to={createPageUrl('Pricing')}>
             <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
               <Crown className="w-4 h-4 mr-2" />
               {language === 'ar' ? 'ترقية الباقة' : 'Upgrade Plan'}
@@ -114,7 +114,7 @@ export default function PlanLimitGuard({ plan, limitType, currentCount, children
                   : `${currentCount} of ${limitCheck.limit} ${entityNames[limitType]}`}
               </p>
             </div>
-            <Link to={createPageUrl('Subscription')}>
+            <Link to={createPageUrl('Pricing')}>
               <Button size="sm" variant="outline">
                 {language === 'ar' ? 'ترقية' : 'Upgrade'}
               </Button>

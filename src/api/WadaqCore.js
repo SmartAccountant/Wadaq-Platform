@@ -175,6 +175,7 @@ function mapUserToClientShape(row) {
   const { password_hash: _p, ...rest } = row;
   return {
     ...rest,
+    subscription_plan: row.subscription_plan || row.subscription_type || null,
     trial_end_date: row.trial_end_date ?? row.trial_ends_at ?? null,
     trial_ends_at: row.trial_ends_at ?? row.trial_end_date ?? null,
     settings: row.settings ?? {},
@@ -267,6 +268,7 @@ async function activateSubscriptionAfterPayment({
   await entities.User.update(userId, {
     subscription_status: "active",
     subscription_type: planId || "paid",
+    subscription_plan: planId || "basic",
     subscription_end_date: end.toISOString(),
   });
 
@@ -601,8 +603,29 @@ export const Wadaq = {
   api: {
     InvokeLLM: async (prompt) => {
       try {
+        await ensureSeeded();
+        const sess = getSession();
+        let userRow = null;
+        if (sess?.userId) {
+          userRow = await entities.User.get(sess.userId);
+          const u = mapUserToClientShape(userRow);
+          const { getAiAccessInfo } = await import("../lib/subscriptionAccess.js");
+          const ai = getAiAccessInfo(u);
+          if (!ai.allowed) {
+            return { text: ai.messageAr || "غير مسموح باستخدام المساعد الذكي ضمن باقتك الحالية." };
+          }
+        }
         const { hybridChat } = await import("../lib/wadaqAi/hybridChat.js");
         const { text } = await hybridChat(String(prompt || ""));
+        if (sess?.userId && userRow) {
+          const u = mapUserToClientShape(userRow);
+          if (u?.subscription_status === "trial") {
+            const used = Number(u.settings?.ai_trial_uses ?? 0);
+            await entities.User.update(sess.userId, {
+              settings: { ...(u.settings || {}), ai_trial_uses: used + 1 },
+            });
+          }
+        }
         return { text };
       } catch {
         /* احتياطي بدون مفاتيح API */

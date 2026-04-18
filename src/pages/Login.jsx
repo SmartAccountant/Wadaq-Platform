@@ -8,6 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { createPageUrl } from "@/utils";
+import { useLanguage } from "@/components/LanguageContext";
+import { cn } from "@/lib/utils";
+import { Languages } from "lucide-react";
 
 const NAVY = "#1a3a5c";
 const GOLD = "#c9a227";
@@ -20,6 +23,7 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const googleId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const { t, language, isRTL, setLanguage } = useLanguage();
 
   const afterAuth = async () => {
     await refresh();
@@ -37,13 +41,13 @@ export default function Login() {
     setSubmitting(true);
     try {
       await Wadaq.auth.login({ email, password });
-      toast({ title: "تم تسجيل الدخول", description: "مرحباً بك في ودق" });
+      toast({ title: t("login_toast_ok_title"), description: t("login_toast_ok_desc") });
       await afterAuth();
     } catch (err) {
       toast({
         variant: "destructive",
-        title: "فشل تسجيل الدخول",
-        description: err?.message || "تحقق من البيانات",
+        title: t("login_toast_fail_title"),
+        description: err?.message || t("login_toast_fail_desc"),
       });
     } finally {
       setSubmitting(false);
@@ -56,13 +60,13 @@ export default function Login() {
     setSubmitting(true);
     try {
       await Wadaq.auth.loginWithGoogle({ credential: c });
-      toast({ title: "تم الدخول عبر Google" });
+      toast({ title: t("login_google_ok") });
       await afterAuth();
     } catch (err) {
       toast({
         variant: "destructive",
         title: "Google",
-        description: err?.message || "فشل المصادقة",
+        description: err?.message || t("login_google_err"),
       });
     } finally {
       setSubmitting(false);
@@ -71,12 +75,43 @@ export default function Login() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-6"
+      className="relative min-h-screen flex items-center justify-center p-6"
       style={{
         background: `linear-gradient(160deg, ${NAVY} 0%, #0f2744 45%, #152a45 100%)`,
       }}
-      dir="rtl"
+      dir={isRTL ? "rtl" : "ltr"}
     >
+      <div
+        className={cn(
+          "absolute top-4 flex items-center gap-2 rounded-xl border border-white/15 bg-black/20 px-2 py-1.5 backdrop-blur-sm",
+          isRTL ? "left-4" : "right-4"
+        )}
+        role="group"
+        aria-label={t("language_label")}
+      >
+        <Languages className="h-4 w-4 text-amber-200/90" />
+        <button
+          type="button"
+          onClick={() => setLanguage("ar")}
+          className={cn(
+            "rounded-lg px-2.5 py-1 text-xs font-bold",
+            language === "ar" ? "bg-white/20 text-white" : "text-slate-300 hover:bg-white/10"
+          )}
+        >
+          {t("language_ar")}
+        </button>
+        <button
+          type="button"
+          onClick={() => setLanguage("en")}
+          className={cn(
+            "rounded-lg px-2.5 py-1 text-xs font-bold",
+            language === "en" ? "bg-white/20 text-white" : "text-slate-300 hover:bg-white/10"
+          )}
+        >
+          {t("language_en")}
+        </button>
+      </div>
+
       <div
         className="w-full max-w-md rounded-2xl shadow-2xl p-8 border"
         style={{
@@ -86,16 +121,16 @@ export default function Login() {
       >
         <div className="text-center mb-8">
           <h1 className="text-2xl font-black mb-1" style={{ color: NAVY }}>
-            ودق
+            {t("app_name_short")}
           </h1>
           <p className="text-sm font-semibold" style={{ color: GOLD }}>
-            تسجيل الدخول
+            {t("login_title")}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">البريد الإلكتروني</Label>
+            <Label htmlFor="email">{t("login_email")}</Label>
             <Input
               id="email"
               type="email"
@@ -107,7 +142,7 @@ export default function Login() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">كلمة المرور</Label>
+            <Label htmlFor="password">{t("login_password")}</Label>
             <Input
               id="password"
               type="password"
@@ -124,7 +159,7 @@ export default function Login() {
             style={{ background: NAVY, borderBottom: `3px solid ${GOLD}` }}
             disabled={submitting}
           >
-            {submitting ? "جاري الدخول…" : "دخول"}
+            {submitting ? t("login_submitting") : t("login_submit")}
           </Button>
         </form>
 
@@ -133,25 +168,25 @@ export default function Login() {
             <GoogleLogin
               onSuccess={onGoogle}
               onError={() =>
-                toast({ variant: "destructive", title: "تعذّر تسجيل الدخول بجوجل" })
+                toast({ variant: "destructive", title: t("login_google_onerror") })
               }
               useOneTap={false}
               theme="outline"
               size="large"
               text="signin_with"
-              locale="ar"
+              locale={language === "ar" ? "ar" : "en"}
             />
           </div>
         ) : (
           <p className="text-center text-xs text-slate-500 mt-4">
-            لإظهار «الدخول بجوجل» أضف <code className="bg-slate-100 px-1 rounded">VITE_GOOGLE_CLIENT_ID</code> في ملف البيئة.
+            {t("login_google_env_hint")}
           </p>
         )}
 
         <p className="text-center text-sm text-slate-600 mt-6">
-          ليس لديك حساب؟{" "}
+          {t("login_no_account")}{" "}
           <Link to="/signup" className="font-bold" style={{ color: NAVY }}>
-            إنشاء حساب جديد
+            {t("login_signup_link")}
           </Link>
         </p>
       </div>

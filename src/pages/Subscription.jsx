@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from "react";
+
+const GOLDEN_STAR_POSITIONS = Array.from({ length: 20 }, (_, i) => ({
+  top: `${((i * 37 + 11) % 92) + 4}%`,
+  left: `${((i * 53 + 7) % 92) + 4}%`,
+}));
 import { Wadaq } from "@/api/WadaqCore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -311,9 +316,12 @@ export default function Subscription() {
 
             {/* Stars background decoration */}
             <div className="absolute inset-0 opacity-10">
-              {[...Array(20)].map((_, i) => (
-                <div key={i} className="absolute w-1 h-1 rounded-full bg-amber-300"
-                  style={{ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%` }} />
+              {GOLDEN_STAR_POSITIONS.map((pos, i) => (
+                <div
+                  key={i}
+                  className="absolute h-1 w-1 rounded-full bg-amber-300"
+                  style={{ top: pos.top, left: pos.left }}
+                />
               ))}
             </div>
 
@@ -440,12 +448,7 @@ export default function Subscription() {
                   <Button
                     onClick={() => handleSubscribe(plan)}
                     disabled={loadingPlanId !== null}
-                    className="w-full mb-6 py-6 text-lg font-bold rounded-xl transition-all duration-300 disabled:opacity-50"
-                    style={{
-                      background: loadingPlanId === null ? `linear-gradient(to right, var(--tw-gradient-stops))` : undefined,
-                      '--tw-gradient-from': plan.color.split(' ')[1],
-                      '--tw-gradient-to': plan.color.split(' ')[3],
-                    }}
+                    className={`w-full mb-6 py-6 text-lg font-bold rounded-xl transition-all duration-300 disabled:opacity-50 bg-gradient-to-r ${plan.color} text-white hover:opacity-95`}
                   >
                     {loadingPlanId === plan.id ? (language === 'ar' ? 'جاري التحميل...' : 'Loading...') : 
                      (language === 'ar' ? 'اشترك الآن' : 'Subscribe Now')}

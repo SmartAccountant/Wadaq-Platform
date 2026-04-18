@@ -2,14 +2,21 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { MessageCircle, Send, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { hybridChat } from "@/lib/wadaqAi/hybridChat";
+import { Wadaq } from "@/api/WadaqCore";
 import { useLanguage } from "@/components/LanguageContext";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
+import { getAiAccessInfo } from "@/lib/subscriptionAccess";
+import { incrementTrialAiUseIfNeeded } from "@/lib/aiUsageControl";
+import { useToast } from "@/components/ui/use-toast";
 
 const NAVY = "#1a3a5c";
 const GOLD = "#c9a227";
 
 export default function WadaqAIChatFAB() {
   const { isRTL } = useLanguage();
+  const { user, refresh } = useAuth();
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,6 +32,17 @@ export default function WadaqAIChatFAB() {
   const send = useCallback(async () => {
     const text = input.trim();
     if (!text || loading) return;
+
+    const ai = getAiAccessInfo(user);
+    if (!ai.allowed) {
+      toast({
+        variant: "destructive",
+        title: "ترقية الباقة",
+        description: ai.messageAr || "يرجى ترقية الباقة لاستخدام المساعد الذكي.",
+      });
+      return;
+    }
+
     setInput("");
     setError(null);
     setLoading(true);
@@ -42,6 +60,8 @@ export default function WadaqAIChatFAB() {
         ...m,
         { role: "assistant", content: reply, engine },
       ]);
+      await incrementTrialAiUseIfNeeded(Wadaq, user);
+      await refresh();
     } catch (e) {
       const msg = e?.message || "تعذّر الاتصال بالمساعد. تحقق من المفاتيح في ملف .env";
       setError(msg);
@@ -56,22 +76,31 @@ export default function WadaqAIChatFAB() {
     } finally {
       setLoading(false);
     }
-  }, [input, loading, messages]);
+  }, [input, loading, messages, user, refresh, toast]);
 
-  /** زر عائم في زاوية منطقة المحتوى (بعيداً عن الشريط الجانبي): RTL → أسفل يسار الشاشة، LTR → أسفل يمين */
+  if (!user) return null;
+
+  /**
+   * موضع ثابت بزاوية منطقة المحتوى (ليس الشريط):
+   * - لا نضع dir=rtl على الحاوية الموضوعية لأنها تدفع flex items-start نحو اليمين فوق الشريط.
+   * - العربية: الشريط يمين → نثبت أسفل يسار الشاشة (left / inset-inline-start في LTR layer).
+   * - pointer-events-none على الغلاف حتى لا يحجب النقر خارج النافذة.
+   */
   return (
     <div
       className={cn(
-        "fixed z-[35] flex max-w-[calc(100vw-1rem)] flex-col gap-2 p-3 sm:bottom-5 sm:p-4",
-        isRTL ? "bottom-16 left-3 items-start sm:bottom-5 sm:left-5" : "bottom-16 right-3 items-end sm:bottom-5 sm:right-5"
+        "pointer-events-none fixed z-[35] flex w-max max-w-[min(20rem,calc(100vw-1.25rem))] flex-col gap-2",
+        isRTL
+          ? "bottom-20 left-3 sm:bottom-6 sm:left-5 lg:left-6"
+          : "bottom-20 right-3 sm:bottom-6 sm:right-5 lg:right-6"
       )}
-      dir="rtl"
     >
-      <div className="flex w-full max-w-[min(100%,22rem)] flex-col gap-2">
+      <div className="pointer-events-auto flex w-full max-w-[20rem] flex-col gap-2">
         {open && (
           <div
             className="w-full overflow-hidden rounded-2xl border bg-white shadow-xl"
-            style={{ borderColor: "rgba(26,58,92,0.2)", maxHeight: "min(65vh, 480px)" }}
+            dir="rtl"
+            style={{ borderColor: "rgba(26,58,92,0.2)", maxHeight: "min(58vh, 420px)" }}
           >
             <div
               className="flex items-center justify-between gap-2 border-b px-4 py-3 text-white"

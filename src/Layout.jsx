@@ -28,6 +28,7 @@ import {
         Tags,
         Shield,
         Plus,
+        Languages,
       } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,6 +45,7 @@ import { useLanguage } from "@/components/LanguageContext";
 import NotificationBell from "@/components/notifications/NotificationBell";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import KeyboardShortcuts, { KeyboardShortcutsHelp } from "@/components/KeyboardShortcuts";
+import SubscriptionAccessGuard from "@/components/auth/SubscriptionAccessGuard";
 
 function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -51,7 +53,7 @@ function LayoutContent({ children, currentPageName }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [openSections, setOpenSections] = React.useState({});
-  const { t, toggleLanguage, language, isRTL } = useLanguage();
+  const { t, language, isRTL, setLanguage } = useLanguage();
 
   const ar = language === 'ar';
 
@@ -63,7 +65,6 @@ function LayoutContent({ children, currentPageName }) {
       icon: LayoutDashboard,
       items: [
         { name: t('dashboard'), page: "Dashboard", icon: LayoutDashboard },
-        { name: ar ? 'الأسعار' : 'Pricing', page: "Pricing", icon: Tags },
         { name: ar ? '💳 الكاشير' : '💳 Cashier', page: "CashierSelection", icon: CreditCard },
       ]
     },
@@ -164,8 +165,39 @@ function LayoutContent({ children, currentPageName }) {
   return core;
   }, [ar, t, user?.role]);
 
+  const currentPageLabel = React.useMemo(() => {
+    const flat = navSections.flatMap((s) =>
+      s.items.map((item) => ({ page: item.page, name: item.name }))
+    );
+    const hit = flat.find((x) => x.page === currentPageName);
+    if (hit) return hit.name;
+    const special =
+      currentPageName === "checkout"
+        ? ar
+          ? "إتمام الدفع"
+          : "Checkout"
+        : currentPageName === "Pricing"
+          ? ar
+            ? "الأسعار"
+            : "Pricing"
+          : currentPageName === "PaymentInvoice"
+            ? ar
+              ? "فاتورة الدفع"
+              : "Payment invoice"
+            : null;
+    if (special) return special;
+    if (!currentPageName || currentPageName === "Dashboard") return t("dashboard");
+    return String(currentPageName)
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+  }, [navSections, currentPageName, ar, t]);
+
   React.useEffect(() => {
-    document.title = 'Wadq - برنامج ودق المحاسبي';
+    document.title = `${currentPageLabel} · ${t("document_title_suffix")}`;
+  }, [currentPageLabel, t]);
+
+  React.useEffect(() => {
     refresh();
   }, [refresh]);
 
@@ -235,7 +267,10 @@ function LayoutContent({ children, currentPageName }) {
   return (
     <div dir={isRTL ? "rtl" : "ltr"} className="min-h-screen">
       <style>{`
-        body { background: #eef1f6; font-family: "Tajawal", system-ui, sans-serif; }
+        body {
+          background: #eef1f6;
+          font-family: ${language === "en" ? '"Segoe UI", system-ui, sans-serif' : '"Tajawal", system-ui, sans-serif'};
+        }
         .page-transition { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
@@ -248,7 +283,7 @@ function LayoutContent({ children, currentPageName }) {
             <Menu className="h-6 w-6" />
           </Button>
           <div className="flex-1 flex justify-center items-center gap-2">
-            <span className="font-black text-lg" style={{ color: '#fff' }}>ودق</span>
+            <span className="font-black text-lg" style={{ color: '#fff' }}>{t("app_name_short")}</span>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <QuickAddMenu className="h-9 px-2 text-xs border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white" />
@@ -272,7 +307,7 @@ function LayoutContent({ children, currentPageName }) {
             style={{ borderColor: "rgba(201,162,39,0.3)" }}
           >
             <div className="min-w-0 flex-1">
-              <p className="text-white font-black text-xl leading-tight">برنامج ودق</p>
+              <p className="text-white font-black text-xl leading-tight">{t("app_name")}</p>
               <p style={{ color: "#c9a227" }} className="text-[11px] tracking-wide mt-0.5">
                 WADAQ SYSTEM
               </p>
@@ -303,16 +338,16 @@ function LayoutContent({ children, currentPageName }) {
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-2"
             aria-label={ar ? "القائمة الرئيسية" : "Main navigation"}
           >
-            <div className="flex flex-col gap-2">
+            <div className="flex min-h-0 flex-col gap-2 pb-1">
             {navSections.map((section) => (
                 <div key={section.key} className="rounded-xl border border-transparent">
                     <button
                       type="button"
                       onClick={() => toggleSection(section.key)}
-                      className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
+                      className="flex min-h-[44px] w-full items-center gap-2 rounded-xl px-3 py-2.5 text-start text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
                     >
                         <section.icon className="h-5 w-5 shrink-0 opacity-90" />
-                        <span className="flex-1 text-right text-sm font-semibold leading-snug">{section.label}</span>
+                        <span className="flex-1 text-end text-sm font-semibold leading-snug">{section.label}</span>
                         <ChevronDown
                           className={cn(
                             "h-4 w-4 shrink-0 opacity-70 transition-transform duration-200",
@@ -339,31 +374,78 @@ function LayoutContent({ children, currentPageName }) {
                 </div>
             ))}
             </div>
-          </nav>
 
-          <div className="shrink-0 space-y-1 border-t bg-[#152f4d] p-3" style={{ borderColor: "rgba(201,162,39,0.25)" }}>
-            <Link
-              to={createPageUrl("Settings")}
-              className={cn(
-                "flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                currentPageName === "Settings"
-                  ? "bg-white/10 text-white"
-                  : "text-slate-400 hover:bg-white/5 hover:text-white"
-              )}
+            <div
+              className="mt-2 space-y-2 border-t bg-[#152f4d] p-3"
+              style={{ borderColor: "rgba(201,162,39,0.25)" }}
             >
-              <Settings className="w-4 h-4 shrink-0 opacity-80" />
-              <span className="font-medium">{ar ? "الإعدادات" : "Settings"}</span>
-            </Link>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full justify-start gap-2 text-amber-100/90 hover:text-white hover:bg-white/10"
-              onClick={handleLogout}
-            >
-              <LogOut className="w-4 h-4" />
-              {ar ? "تسجيل الخروج" : "Logout"}
-            </Button>
-          </div>
+              <div className="space-y-1.5" role="group" aria-label={t("language_label")}>
+                <div className="flex items-center gap-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                  <Languages className="h-3.5 w-3.5 opacity-80" />
+                  {t("language_label")}
+                </div>
+                <div className="flex rounded-lg bg-black/30 p-1 gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setLanguage("ar")}
+                    className={cn(
+                      "flex-1 rounded-md py-2 text-xs font-bold transition-colors",
+                      language === "ar"
+                        ? "bg-white/20 text-white shadow-sm"
+                        : "text-slate-400 hover:bg-white/10 hover:text-slate-200"
+                    )}
+                  >
+                    {t("language_ar")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLanguage("en")}
+                    className={cn(
+                      "flex-1 rounded-md py-2 text-xs font-bold transition-colors",
+                      language === "en"
+                        ? "bg-white/20 text-white shadow-sm"
+                        : "text-slate-400 hover:bg-white/10 hover:text-slate-200"
+                    )}
+                  >
+                    {t("language_en")}
+                  </button>
+                </div>
+              </div>
+              <Link
+                to={createPageUrl("Pricing")}
+                className={cn(
+                  "flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                  currentPageName === "Pricing"
+                    ? "bg-white/10 text-white"
+                    : "text-slate-400 hover:bg-white/5 hover:text-white"
+                )}
+              >
+                <Tags className="w-4 h-4 shrink-0 opacity-80" />
+                <span className="font-medium">{ar ? "الأسعار" : "Pricing"}</span>
+              </Link>
+              <Link
+                to={createPageUrl("Settings")}
+                className={cn(
+                  "flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                  currentPageName === "Settings"
+                    ? "bg-white/10 text-white"
+                    : "text-slate-400 hover:bg-white/5 hover:text-white"
+                )}
+              >
+                <Settings className="w-4 h-4 shrink-0 opacity-80" />
+                <span className="font-medium">{ar ? "الإعدادات" : "Settings"}</span>
+              </Link>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full justify-start gap-2 text-amber-100/90 hover:text-white hover:bg-white/10"
+                onClick={handleLogout}
+              >
+                <LogOut className="w-4 h-4" />
+                {ar ? "تسجيل الخروج" : "Logout"}
+              </Button>
+            </div>
+          </nav>
         </div>
       </aside>
 
@@ -372,13 +454,11 @@ function LayoutContent({ children, currentPageName }) {
           className="hidden lg:flex items-center justify-between gap-4 px-8 py-3 border-b bg-white/90 backdrop-blur-sm sticky top-0 z-30 shadow-sm"
           style={{ borderColor: "rgba(26,58,92,0.12)" }}
         >
-          <span className="text-sm font-semibold text-slate-600">
-            {ar ? "لوحة التحكم" : "Dashboard"}
-          </span>
+          <span className="text-sm font-semibold text-slate-600">{currentPageLabel}</span>
           <QuickAddMenu />
         </div>
         <div className="p-6 lg:p-8 page-transition">
-          {children}
+          <SubscriptionAccessGuard pageName={currentPageName}>{children}</SubscriptionAccessGuard>
         </div>
       </main>
       
