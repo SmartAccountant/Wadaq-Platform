@@ -62,6 +62,11 @@ function AppRoutes() {
 
       <Route path="/pricing" element={<Navigate to="/Pricing" replace />} />
 
+      {/* أسماء شائعة لصفحة الإدارة — المسار الفعلي /admin/settings */}
+      <Route path="/Administration" element={<Navigate to="/admin/settings" replace />} />
+      <Route path="/administration" element={<Navigate to="/admin/settings" replace />} />
+      <Route path="/Admin" element={<Navigate to="/admin" replace />} />
+
       <Route element={<AuthSubscriptionLayout />}>
         {Object.entries(Pages).map(([path, Page]) => (
           <Route key={path} path={`/${path}`} element={<Page />} />
