@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import { format } from "date-fns";
 import ThermalReceipt from "@/components/invoices/ThermalReceipt";
 import SubscriptionGuard from "@/components/auth/SubscriptionGuard";
+import AdminCashierGate from "@/components/auth/AdminCashierGate";
 
 // ─── Open Cash Drawer ──────────────────────────────────────────────────────────
 function openCashDrawer() {
@@ -890,8 +891,10 @@ function ReturnModal({ onClose, language, queryClient }) {
 
 export default function POSPage() {
   return (
-    <SubscriptionGuard>
-      <POSContent />
-    </SubscriptionGuard>
+    <AdminCashierGate>
+      <SubscriptionGuard>
+        <POSContent />
+      </SubscriptionGuard>
+    </AdminCashierGate>
   );
 }

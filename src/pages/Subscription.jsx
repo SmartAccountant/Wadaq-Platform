@@ -1,9 +1,4 @@
-import React, { useState, useEffect } from "react";
-
-const GOLDEN_STAR_POSITIONS = Array.from({ length: 20 }, (_, i) => ({
-  top: `${((i * 37 + 11) % 92) + 4}%`,
-  left: `${((i * 53 + 7) % 92) + 4}%`,
-}));
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import { Wadaq } from "@/api/WadaqCore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +7,11 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { useLanguage } from "@/components/LanguageContext";
 
+const GOLDEN_STAR_POSITIONS = Array.from({ length: 20 }, (_, i) => ({
+  top: `${((i * 37 + 11) % 92) + 4}%`,
+  left: `${((i * 53 + 7) % 92) + 4}%`,
+}));
+
 export default function Subscription() {
   const { language } = useLanguage();
   const [loadingPlanId, setLoadingPlanId] = useState(null);
@@ -19,6 +19,10 @@ export default function Subscription() {
   const [user, setUser] = useState(null);
   const [billingCycle, setBillingCycle] = useState("yearly");
   const navigate = useNavigate();
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     Wadaq.auth.me().then(setUser).catch(console.error);
@@ -237,8 +241,8 @@ export default function Subscription() {
   };
 
   return (
-    <div className="min-h-screen py-10 px-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
-      <div className="max-w-7xl mx-auto">
+    <div className="relative z-0 w-full py-8 px-4 sm:py-10 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100 [isolation:isolate]">
+      <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-slate-100 mb-4">

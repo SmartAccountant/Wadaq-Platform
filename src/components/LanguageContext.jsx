@@ -180,6 +180,9 @@ const translations = {
     'language_ar': 'العربية',
     'language_en': 'English',
 
+    'sidebar_collapse': 'طي القائمة وإظهار الرموز فقط',
+    'sidebar_expand': 'توسيع القائمة وإظهار الأسماء',
+
     'subscription_upgrade_title': 'ترقية الباقة مطلوبة',
     'subscription_upgrade_body':
       'هذه الميزة أو الوحدة غير متاحة ضمن باقتك الحالية{plan}. لمواصلة الاستفادة منها، يرجى اختيار باقة أعلى تتضمّن الصلاحيات المطلوبة وفق جدول الاشتراكات المعتمد.',
@@ -428,6 +431,9 @@ const translations = {
     'language_label': 'Language',
     'language_ar': 'العربية',
     'language_en': 'English',
+
+    'sidebar_collapse': 'Collapse menu (icons only)',
+    'sidebar_expand': 'Expand menu (show labels)',
 
     'subscription_upgrade_title': 'Upgrade required',
     'subscription_upgrade_body':

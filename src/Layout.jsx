@@ -29,6 +29,8 @@ import {
         Shield,
         Plus,
         Languages,
+        ChevronsLeft,
+        ChevronsRight,
       } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,6 +55,14 @@ function LayoutContent({ children, currentPageName }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [openSections, setOpenSections] = React.useState({});
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return window.localStorage.getItem("wadaq_sidebar_collapsed") === "1";
+    } catch {
+      return false;
+    }
+  });
   const { t, language, isRTL, setLanguage } = useLanguage();
 
   const ar = language === 'ar';
@@ -65,7 +75,9 @@ function LayoutContent({ children, currentPageName }) {
       icon: LayoutDashboard,
       items: [
         { name: t('dashboard'), page: "Dashboard", icon: LayoutDashboard },
-        { name: ar ? '💳 الكاشير' : '💳 Cashier', page: "CashierSelection", icon: CreditCard },
+        ...(user?.role === "admin"
+          ? [{ name: ar ? '💳 الكاشير' : '💳 Cashier', page: "CashierSelection", icon: CreditCard }]
+          : []),
       ]
     },
     {
@@ -217,6 +229,26 @@ function LayoutContent({ children, currentPageName }) {
     setOpenSections(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
+  const toggleSidebarCollapsed = React.useCallback(() => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        window.localStorage.setItem("wadaq_sidebar_collapsed", next ? "1" : "0");
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  }, []);
+
+  const isSectionActive = React.useCallback(
+    (section) =>
+      section.items.some((item) =>
+        item.to ? location.pathname === item.to : currentPageName === item.page
+      ),
+    [location.pathname, currentPageName]
+  );
+
   const handleLogout = () => {
     Wadaq.auth.logout();
     refresh();
@@ -271,8 +303,9 @@ function LayoutContent({ children, currentPageName }) {
           background: #eef1f6;
           font-family: ${language === "en" ? '"Segoe UI", system-ui, sans-serif' : '"Tajawal", system-ui, sans-serif'};
         }
-        .page-transition { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        /* بدون إخفاء الشفافية عند البداية — يمنع ظهور صفحة بلا محتوى مرئي */
+        .page-transition { animation: fadeIn 0.28s ease-out; }
+        @keyframes fadeIn { from { transform: translateY(6px); } to { transform: translateY(0); } }
         /* شريط تمرير باهت بنفس نغمة الشريط الجانبي */
         .sidebar-nav-scroll {
           scrollbar-width: thin;
@@ -313,25 +346,62 @@ function LayoutContent({ children, currentPageName }) {
 
       {sidebarOpen && <div className="lg:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setSidebarOpen(false)} />}
 
-      {/* Sidebar */}
+      {/* Sidebar — يمكن طيّها على الشاشات الكبيرة لإظهار الرموز فقط */}
       <aside className={cn(
-        "fixed top-0 z-50 h-full w-72 transform transition-all duration-300 ease-in-out lg:translate-x-0 shadow-2xl",
+        "fixed top-0 z-50 h-full w-72 transform transition-[width,transform] duration-300 ease-in-out lg:translate-x-0 shadow-2xl",
+        sidebarCollapsed ? "lg:w-[4.25rem]" : "lg:w-72",
         isRTL ? "right-0" : "left-0",
         sidebarOpen ? "translate-x-0" : isRTL ? "translate-x-full lg:translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}
       style={{ background: '#1a3a5c', borderRight: isRTL ? '3px solid #c9a227' : 'none', borderLeft: isRTL ? 'none' : '3px solid #c9a227' }}>
         <div className="flex h-full min-h-0 max-h-[100dvh] flex-col" style={{ fontFamily: '"Tajawal", system-ui, sans-serif' }}>
           <div
-            className="flex shrink-0 items-start justify-between gap-3 border-b px-4 py-3"
+            className={cn(
+              "flex shrink-0 items-center gap-2 border-b px-2 py-2.5 sm:px-3",
+              sidebarCollapsed ? "lg:flex-col lg:py-3" : "justify-between"
+            )}
             style={{ borderColor: "rgba(201,162,39,0.3)" }}
           >
-            <div className="min-w-0 flex-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebarCollapsed}
+              className="hidden h-9 w-9 shrink-0 text-slate-200 hover:bg-white/10 hover:text-white lg:inline-flex"
+              title={sidebarCollapsed ? t("sidebar_expand") : t("sidebar_collapse")}
+              aria-expanded={!sidebarCollapsed}
+              aria-label={sidebarCollapsed ? t("sidebar_expand") : t("sidebar_collapse")}
+            >
+              {sidebarCollapsed !== isRTL ? (
+                <ChevronsRight className="h-5 w-5" />
+              ) : (
+                <ChevronsLeft className="h-5 w-5" />
+              )}
+            </Button>
+            <div
+              className={cn(
+                "min-w-0 flex-1",
+                sidebarCollapsed && "hidden lg:hidden"
+              )}
+            >
               <p className="text-white font-black text-xl leading-tight">{t("app_name")}</p>
               <p style={{ color: "#c9a227" }} className="text-[11px] tracking-wide mt-0.5">
                 WADAQ SYSTEM
               </p>
             </div>
-            {user ? (
+            {sidebarCollapsed ? (
+              <div
+                className="hidden lg:flex h-9 w-9 items-center justify-center rounded-lg border text-[10px] font-black text-amber-300"
+                style={{
+                  borderColor: "rgba(201,162,39,0.35)",
+                  background: "rgba(0,0,0,0.2)",
+                }}
+                title={t("app_name_short")}
+              >
+                W
+              </div>
+            ) : null}
+            {user && !sidebarCollapsed ? (
               <div
                 className="shrink-0 max-w-[55%] rounded-lg px-2 py-1.5 border text-left"
                 style={{
@@ -351,13 +421,27 @@ function LayoutContent({ children, currentPageName }) {
                 ) : null}
               </div>
             ) : null}
+            {user && sidebarCollapsed ? (
+              <div
+                className="hidden lg:flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-[10px] font-bold text-slate-300"
+                style={{
+                  borderColor: "rgba(201,162,39,0.22)",
+                  background: "rgba(0,0,0,0.15)",
+                }}
+                dir="ltr"
+                title={[user?.name, user?.email].filter(Boolean).join(" · ") || ""}
+              >
+                {(user?.name || user?.email || "?").charAt(0).toUpperCase()}
+              </div>
+            ) : null}
           </div>
 
           <nav
-            className="sidebar-nav-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-2"
+            className="sidebar-nav-scroll min-h-0 flex-1 overflow-y-auto overflow-x-visible overscroll-contain px-2 py-2"
             aria-label={ar ? "القائمة الرئيسية" : "Main navigation"}
           >
-            <div className="flex min-h-0 flex-col gap-2 pb-1">
+            {/* وضع موسّع أو الجوال: قوائم بأسماء */}
+            <div className={cn("flex min-h-0 flex-col gap-2 pb-1", sidebarCollapsed && "lg:hidden")}>
             {navSections.map((section) => (
                 <div key={section.key} className="rounded-xl border border-transparent">
                     <button
@@ -394,8 +478,61 @@ function LayoutContent({ children, currentPageName }) {
             ))}
             </div>
 
+            {/* سطح المكتب مطوي: رموز فقط + قائمة منسدلة لكل قسم */}
             <div
-              className="mt-2 space-y-2 border-t bg-[#152f4d] p-3"
+              className={cn(
+                "hidden flex-col items-center gap-1.5 py-1",
+                sidebarCollapsed ? "lg:flex" : "lg:hidden"
+              )}
+            >
+              {navSections.map((section) => (
+                <DropdownMenu key={`collapsed-${section.key}`}>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      title={section.label}
+                      className={cn(
+                        "flex h-11 w-11 items-center justify-center rounded-xl text-slate-200 transition-colors hover:bg-white/10 hover:text-white",
+                        isSectionActive(section) && "bg-white/15 text-white ring-1 ring-amber-400/40"
+                      )}
+                      aria-label={section.label}
+                    >
+                      <section.icon className="h-5 w-5 shrink-0 opacity-90" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    side={isRTL ? "left" : "right"}
+                    align="start"
+                    sideOffset={8}
+                    className="min-w-[12rem]"
+                    dir={isRTL ? "rtl" : "ltr"}
+                  >
+                    <div className="px-2 py-1.5 text-xs font-semibold text-slate-500 border-b border-slate-100 mb-1">
+                      {section.label}
+                    </div>
+                    {section.items.map((item) => (
+                      <DropdownMenuItem key={item.page + (item.to || "")} asChild>
+                        <Link
+                          to={item.to || createPageUrl(item.page)}
+                          className={cn(
+                            (item.to ? location.pathname === item.to : currentPageName === item.page) &&
+                              "bg-slate-100 font-medium"
+                          )}
+                        >
+                          {item.name}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ))}
+            </div>
+
+            <div
+              className={cn(
+                "mt-2 space-y-2 border-t bg-[#152f4d] p-3",
+                sidebarCollapsed && "lg:hidden"
+              )}
               style={{ borderColor: "rgba(201,162,39,0.25)" }}
             >
               <button
@@ -446,11 +583,67 @@ function LayoutContent({ children, currentPageName }) {
                 {ar ? "تسجيل الخروج" : "Logout"}
               </Button>
             </div>
+
+            {/* سفل الشريط مطوي: أيقونات فقط */}
+            <div
+              className={cn(
+                "mt-2 hidden flex-col items-center gap-1.5 border-t bg-[#152f4d] px-1 py-2",
+                sidebarCollapsed ? "lg:flex" : "lg:hidden"
+              )}
+              style={{ borderColor: "rgba(201,162,39,0.25)" }}
+            >
+              <button
+                type="button"
+                onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
+                className="flex h-10 w-10 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+                title={language === "ar" ? t("language_en") : t("language_ar")}
+                aria-label={language === "ar" ? t("language_en") : t("language_ar")}
+              >
+                <Languages className="h-5 w-5 opacity-90" />
+              </button>
+              <Link
+                to={createPageUrl("Pricing")}
+                title={ar ? "الأسعار" : "Pricing"}
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-lg transition-colors",
+                  currentPageName === "Pricing"
+                    ? "bg-white/15 text-white"
+                    : "text-slate-400 hover:bg-white/5 hover:text-white"
+                )}
+              >
+                <Tags className="h-5 w-5 opacity-90" />
+              </Link>
+              <Link
+                to={createPageUrl("Settings")}
+                title={ar ? "الإعدادات" : "Settings"}
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-lg transition-colors",
+                  currentPageName === "Settings"
+                    ? "bg-white/15 text-white"
+                    : "text-slate-400 hover:bg-white/5 hover:text-white"
+                )}
+              >
+                <Settings className="h-5 w-5 opacity-90" />
+              </Link>
+              <button
+                type="button"
+                title={ar ? "تسجيل الخروج" : "Logout"}
+                className="flex h-10 w-10 items-center justify-center rounded-lg text-amber-100/90 transition-colors hover:bg-white/10 hover:text-white"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-5 w-5" />
+              </button>
+            </div>
           </nav>
         </div>
       </aside>
 
-      <main className={cn("min-h-screen pt-16 lg:pt-0", isRTL ? "lg:mr-72" : "lg:ml-72")}>
+      <main className={cn(
+        "min-h-screen pt-16 lg:pt-0",
+        isRTL
+          ? sidebarCollapsed ? "lg:mr-[4.25rem]" : "lg:mr-72"
+          : sidebarCollapsed ? "lg:ml-[4.25rem]" : "lg:ml-72"
+      )}>
         <div
           className="hidden lg:flex items-center justify-between gap-4 px-8 py-3 border-b bg-white/90 backdrop-blur-sm sticky top-0 z-30 shadow-sm"
           style={{ borderColor: "rgba(26,58,92,0.12)" }}
@@ -458,7 +651,7 @@ function LayoutContent({ children, currentPageName }) {
           <span className="text-sm font-semibold text-slate-600">{currentPageLabel}</span>
           <QuickAddMenu />
         </div>
-        <div className="p-6 lg:p-8 page-transition">
+        <div className="relative z-0 p-6 lg:p-8 page-transition">
           <SubscriptionAccessGuard pageName={currentPageName}>{children}</SubscriptionAccessGuard>
         </div>
       </main>

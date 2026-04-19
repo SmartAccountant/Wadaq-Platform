@@ -93,8 +93,8 @@ function App() {
         <AuthProvider>
           <GoogleRoot>
             <Router>
-              <div className="min-h-screen flex flex-col">
-                <div className="flex-1 w-full min-w-0">
+              <div className="flex min-h-screen flex-col">
+                <div className="min-h-0 w-full min-w-0 flex-1">
                   <AppRoutes />
                 </div>
                 <WadaqAIChatFAB />

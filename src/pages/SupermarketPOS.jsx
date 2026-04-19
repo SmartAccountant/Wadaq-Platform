@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
 import { format } from "date-fns";
 import ThermalReceipt from "@/components/invoices/ThermalReceipt";
 import SubscriptionGuard from "@/components/auth/SubscriptionGuard";
+import AdminCashierGate from "@/components/auth/AdminCashierGate";
 
 function SupermarketPOSContent() {
   const { language, isRTL } = useLanguage();
@@ -640,9 +641,11 @@ function SupermarketPOSContent() {
 
 export default function SupermarketPOS() {
   return (
-    <SubscriptionGuard>
-      <SupermarketPOSContent />
-    </SubscriptionGuard>
+    <AdminCashierGate>
+      <SubscriptionGuard>
+        <SupermarketPOSContent />
+      </SubscriptionGuard>
+    </AdminCashierGate>
   );
 }
 

@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useLanguage } from "@/components/LanguageContext";
 import { createPageUrl } from "../utils";
 import SubscriptionGuard from "@/components/auth/SubscriptionGuard";
+import AdminCashierGate from "@/components/auth/AdminCashierGate";
 
 function CashierSelectionContent() {
   const navigate = useNavigate();
@@ -16,8 +16,10 @@ function CashierSelectionContent() {
 
 export default function CashierSelection() {
   return (
-    <SubscriptionGuard>
-      <CashierSelectionContent />
-    </SubscriptionGuard>
+    <AdminCashierGate>
+      <SubscriptionGuard>
+        <CashierSelectionContent />
+      </SubscriptionGuard>
+    </AdminCashierGate>
   );
 }
