@@ -1,7 +1,35 @@
 /**
  * نواة واجهة برنامج ودق المحاسبي: طبقة بيانات محلية (ذاكرة و sessionStorage) وكيانات موحّدة.
+ * عند تعيين VITE_WADAQ_API_URL تُدار المصادقة عبر خادم API + PostgreSQL (JWT).
  */
 import { hashPasswordForAuth } from "../lib/authCrypto.js";
+import * as remoteAuth from "./remoteAuthClient.js";
+
+function useRemoteApiAuth() {
+  return remoteAuth.isRemoteAuthEnabled();
+}
+
+/** مزامنة مستخدم الخادم مع الذاكرة المحلية لبقاء الكيانات تعمل دون تغيير باقي الشيفرة */
+async function upsertLocalUserFromServer(userRow) {
+  if (!userRow?.id) return;
+  await ensureSeeded();
+  const id = userRow.id;
+  const sanitized = { ...userRow };
+  delete sanitized.password_hash;
+  const existingId = await entities.User.get(id);
+  if (existingId) {
+    await entities.User.update(id, { ...sanitized, id });
+    return;
+  }
+  const em = String(userRow.email || "")
+    .trim()
+    .toLowerCase();
+  const byEmail = await entities.User.filter({ email: em });
+  if (byEmail[0] && byEmail[0].id !== id) {
+    await entities.User.delete(byEmail[0].id);
+  }
+  await entities.User.create({ ...sanitized, id });
+}
 
 const STORAGE_KEY = "wadaq_local_entities_v1";
 const SESSION_AUTH_KEY = "wadaq_auth_session_v1";
@@ -349,6 +377,24 @@ export const Wadaq = {
   auth: {
     async me() {
       await ensureSeeded();
+      if (useRemoteApiAuth()) {
+        const sess = getSession();
+        if (!sess?.accessToken) {
+          if (sess?.userId) clearSession();
+          return null;
+        }
+        try {
+          const { user } = await remoteAuth.remoteMe(sess.accessToken);
+          await upsertLocalUserFromServer(user);
+          setSession({ userId: user.id, accessToken: sess.accessToken });
+          let row = await entities.User.get(user.id);
+          row = await syncSubscriptionDatesOnRead(row);
+          return mapUserToClientShape(row);
+        } catch {
+          clearSession();
+          return null;
+        }
+      }
       const sess = getSession();
       if (!sess?.userId) return null;
       let row = await entities.User.get(sess.userId);
@@ -366,6 +412,12 @@ export const Wadaq = {
 
     async login({ email, password }) {
       await ensureSeeded();
+      if (useRemoteApiAuth()) {
+        const { token, user } = await remoteAuth.remoteLogin({ email, password });
+        setSession({ userId: user.id, accessToken: token });
+        await upsertLocalUserFromServer(user);
+        return mapUserToClientShape(user);
+      }
       const em = String(email).trim().toLowerCase();
       const found = await entities.User.filter({ email: em });
       const row = found[0];
@@ -381,6 +433,18 @@ export const Wadaq = {
 
     async signup({ email, password, name, company_name, company_vat_number }) {
       await ensureSeeded();
+      if (useRemoteApiAuth()) {
+        const { token, user } = await remoteAuth.remoteSignup({
+          email,
+          password,
+          name,
+          company_name,
+          company_vat_number,
+        });
+        setSession({ userId: user.id, accessToken: token });
+        await upsertLocalUserFromServer(user);
+        return mapUserToClientShape(user);
+      }
       const em = String(email).trim().toLowerCase();
       const existing = await entities.User.filter({ email: em });
       if (existing.length) throw new Error("البريد الإلكتروني مسجّل مسبقاً");
@@ -414,6 +478,12 @@ export const Wadaq = {
 
     async loginWithGoogle({ credential }) {
       await ensureSeeded();
+      if (useRemoteApiAuth()) {
+        const { token, user } = await remoteAuth.remoteGoogle({ credential });
+        setSession({ userId: user.id, accessToken: token });
+        await upsertLocalUserFromServer(user);
+        return mapUserToClientShape(user);
+      }
       const g = parseGoogleJwt(credential);
       if (!g?.email) throw new Error("تعذّر قراءة بيانات جوجل");
       const em = String(g.email).trim().toLowerCase();
@@ -459,12 +529,27 @@ export const Wadaq = {
       await ensureSeeded();
       const sess = getSession();
       if (!sess?.userId) throw new Error("غير مصرّح");
+      if (useRemoteApiAuth() && sess.accessToken) {
+        const { user } = await remoteAuth.remotePatchMe(sess.accessToken, data);
+        await upsertLocalUserFromServer(user);
+        return mapUserToClientShape(user);
+      }
       const updated = await entities.User.update(sess.userId, { ...data });
       return mapUserToClientShape(updated);
     },
 
     async isAuthenticated() {
       await ensureSeeded();
+      if (useRemoteApiAuth()) {
+        const sess = getSession();
+        if (!sess?.accessToken) return false;
+        try {
+          await remoteAuth.remoteMe(sess.accessToken);
+          return true;
+        } catch {
+          return false;
+        }
+      }
       const sess = getSession();
       if (!sess?.userId) return false;
       const row = await entities.User.get(sess.userId);

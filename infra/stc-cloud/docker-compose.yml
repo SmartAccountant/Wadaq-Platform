@@ -1,0 +1,17 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: wadaq-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-wadaq}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-wadaq}
+    ports:
+      # للإنتاج: احذف السطر أو اربط بـ 127.0.0.1 فقط واستخدم VPN/SSH tunnel
+      - "${POSTGRES_BIND:-127.0.0.1:5432}:5432"
+    volumes:
+      - wadaq_pgdata:/var/lib/postgresql/data
+
+volumes:
+  wadaq_pgdata:
