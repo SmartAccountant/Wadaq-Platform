@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -90,7 +91,7 @@ export default function AdminSettings() {
   const { data: me } = useQuery({
     queryKey: ["currentUser"],
     queryFn: () => Wadaq.auth.me(),
-    enabled: user?.role === "admin",
+    enabled: isSuperAdminUser(user),
   });
 
   React.useEffect(() => {
@@ -112,7 +113,7 @@ export default function AdminSettings() {
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["adminUsers"],
     queryFn: () => Wadaq.entities.User.list("-created_date"),
-    enabled: user?.role === "admin",
+    enabled: isSuperAdminUser(user),
   });
 
   const filtered = useMemo(() => {
@@ -208,7 +209,7 @@ export default function AdminSettings() {
       toast({ variant: "destructive", title: "فشل الإنشاء", description: e?.message }),
   });
 
-  if (user?.role !== "admin") {
+  if (!isSuperAdminUser(user)) {
     return <Navigate to="/Dashboard" replace />;
   }
 

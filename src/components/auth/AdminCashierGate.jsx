@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { createPageUrl } from "@/utils";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 /** يقيّد الكاشير / نقطة البيع على المسؤول فقط (حتى إشعار آخر). */
 export default function AdminCashierGate({ children }) {
@@ -14,7 +15,7 @@ export default function AdminCashierGate({ children }) {
     );
   }
 
-  if (user?.role !== "admin") {
+  if (!isSuperAdminUser(user) && user?.role !== "admin") {
     return <Navigate to={createPageUrl("Dashboard")} replace />;
   }
 

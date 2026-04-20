@@ -6,6 +6,7 @@ import { AlertCircle, Clock } from "lucide-react";
 import { differenceInDays, parseISO } from "date-fns";
 import { Link, useNavigate } from "react-router-dom";
 import { createPageUrl } from "../../utils";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 export default function TrialCheck({ children }) {
   const [user, setUser] = useState(null);
@@ -21,8 +22,7 @@ export default function TrialCheck({ children }) {
     try {
       const currentUser = await Wadaq.auth.me();
       
-      // Admin users bypass all trial checks
-      if (currentUser.role === "admin") {
+      if (isSuperAdminUser(currentUser) || currentUser.role === "admin") {
         setUser(currentUser);
         setLoading(false);
         return;
@@ -103,7 +103,7 @@ export default function TrialCheck({ children }) {
   // عرض تنبيه التجربة إذا كانت أقل من 3 أيام (لكن ليس للـ Admin)
   return (
     <>
-      {user?.subscription_status === "trial" && user?.role !== "admin" && trialDaysLeft !== null && trialDaysLeft <= 3 && trialDaysLeft >= 0 && (
+      {user?.subscription_status === "trial" && !isSuperAdminUser(user) && user?.role !== "admin" && trialDaysLeft !== null && trialDaysLeft <= 3 && trialDaysLeft >= 0 && (
         <div className="bg-amber-50 border-b-2 border-amber-200 py-3 px-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-3">

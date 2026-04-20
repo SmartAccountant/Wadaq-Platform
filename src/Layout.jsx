@@ -48,6 +48,7 @@ import NotificationBell from "@/components/notifications/NotificationBell";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import KeyboardShortcuts, { KeyboardShortcutsHelp } from "@/components/KeyboardShortcuts";
 import SubscriptionAccessGuard from "@/components/auth/SubscriptionAccessGuard";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 function LayoutContent({ children, currentPageName }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -75,7 +76,7 @@ function LayoutContent({ children, currentPageName }) {
       icon: LayoutDashboard,
       items: [
         { name: t('dashboard'), page: "Dashboard", icon: LayoutDashboard },
-        ...(user?.role === "admin"
+        ...(isSuperAdminUser(user) || user?.role === "admin"
           ? [{ name: ar ? '💳 الكاشير' : '💳 Cashier', page: "CashierSelection", icon: CreditCard }]
           : []),
       ]
@@ -149,13 +150,18 @@ function LayoutContent({ children, currentPageName }) {
       ]
     },
   ];
-  if (user?.role === "admin") {
+  if (isSuperAdminUser(user)) {
     const insertAt = Math.max(0, core.length - 1);
     core.splice(insertAt, 0, {
       key: "adminZone",
       label: ar ? "الإدارة" : "Administration",
       icon: Shield,
       items: [
+        {
+          name: ar ? "لوحة المسؤول" : "Admin console",
+          page: "admin",
+          to: "/admin",
+        },
         {
           name: ar ? "إعدادات المسؤول" : "Admin settings",
           page: "admin-settings",
@@ -175,7 +181,7 @@ function LayoutContent({ children, currentPageName }) {
     });
   }
   return core;
-  }, [ar, t, user?.role]);
+  }, [ar, t, user]);
 
   const currentPageLabel = React.useMemo(() => {
     const flat = navSections.flatMap((s) =>

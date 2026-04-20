@@ -11,6 +11,7 @@ import ExpenseForm from "@/components/expenses/ExpenseForm";
 import OCRScanner from "@/components/expenses/OCRScanner";
 import { useLanguage } from "@/components/LanguageContext";
 import SubscriptionGuard from "@/components/auth/SubscriptionGuard";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 const categoryLabels = {
   rent: "إيجار",
@@ -139,7 +140,7 @@ function ExpensesContent() {
           </p>
         </div>
         <div className="flex gap-2">
-          {currentUser?.role === 'admin' && (
+          {(isSuperAdminUser(currentUser) || currentUser?.role === 'admin') && (
             <Button
               onClick={() => setShowOCR(true)}
               variant="outline"

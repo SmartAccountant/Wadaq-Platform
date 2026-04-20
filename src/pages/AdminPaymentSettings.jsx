@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { CreditCard, Eye, EyeOff, Loader2, Shield } from "lucide-react";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 const PS_ID = "ps-global";
 
@@ -59,7 +60,7 @@ export default function AdminPaymentSettings() {
       toast({ variant: "destructive", title: "فشل الحفظ", description: e?.message || "" }),
   });
 
-  if (user?.role !== "admin") {
+  if (!isSuperAdminUser(user)) {
     return <Navigate to="/Dashboard" replace />;
   }
 

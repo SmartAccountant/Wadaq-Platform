@@ -3,6 +3,8 @@
  * التجربة: جميع القوائم متاحة؛ الذكاء الاصطناعي يُقيَّد في الواجهة (7 استخدامات).
  */
 
+import { isSuperAdminUser } from "./superAdmin.js";
+
 export const TRIAL_AI_LIMIT = 7;
 
 /** صفحات الباقة الأساسية */
@@ -71,7 +73,7 @@ const PLAN_PAGE_ACCESS = {
 
 export function getEffectivePlanId(user) {
   if (!user) return "trial";
-  if (user.role === "admin") return "smart";
+  if (isSuperAdminUser(user) || user.role === "admin") return "smart";
   const raw = String(user.subscription_plan || user.subscription_type || "").trim();
   if (user.subscription_status === "trial") return "trial";
   if (user.subscription_status !== "active") return "trial";
@@ -94,14 +96,14 @@ export function canAccessPageForPlan(planId, pageName) {
 
 export function canAccessPage(user, pageName) {
   if (!user) return true;
-  if (user.role === "admin") return true;
+  if (isSuperAdminUser(user) || user.role === "admin") return true;
   return canAccessPageForPlan(getEffectivePlanId(user), pageName);
 }
 
 /** استخدام الذكاء الاصطناعي */
 export function getAiAccessInfo(user) {
   if (!user) return { allowed: false, reason: "no_user" };
-  if (user.role === "admin") return { allowed: true, remaining: null };
+  if (isSuperAdminUser(user) || user.role === "admin") return { allowed: true, remaining: null };
 
   if (user.subscription_status === "trial") {
     const used = Number(user.settings?.ai_trial_uses ?? 0);

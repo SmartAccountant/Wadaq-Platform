@@ -11,6 +11,7 @@ import { useLanguage } from "@/components/LanguageContext";
 import PrinterManager from "@/components/printer/PrinterManager";
 import InvoiceCustomizer from "@/components/invoices/InvoiceCustomizer";
 import "@/components/printer/ThermalPrintService";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 /**
  * إعدادات حساب المستخدم: بيانات المنشأة للفواتير، الشعار، نماذج الفواتير، الطابعات، ومفتاح API عند التوفّر
@@ -80,7 +81,7 @@ export default function Settings() {
       company_email: companyEmail,
       company_vat_number: companyVatNumber,
     };
-    if (user?.role === "admin") {
+    if (isSuperAdminUser(user) || user?.role === "admin") {
       payload.organization_name = organizationName;
       payload.app_name = appName;
     }
@@ -151,7 +152,7 @@ export default function Settings() {
           </p>
         </CardHeader>
         <CardContent className="p-6 space-y-6">
-          {user?.role === "admin" && (
+          {(isSuperAdminUser(user) || user?.role === "admin") && (
             <>
               <div className="space-y-2">
                 <Label htmlFor="organizationName" className="text-slate-700">

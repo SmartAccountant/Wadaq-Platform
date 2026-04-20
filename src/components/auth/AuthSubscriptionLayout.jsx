@@ -2,6 +2,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { isSubscriptionEffective } from "@/api/WadaqCore";
 import { createPageUrl } from "@/utils";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 import __Layout from "@/Layout.jsx";
 
 const ALLOWED_WHEN_EXPIRED = new Set([
@@ -43,7 +44,12 @@ export default function AuthSubscriptionLayout() {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (user.role !== "admin" && !isSubscriptionEffective(user) && !ALLOWED_WHEN_EXPIRED.has(seg)) {
+  if (
+    !isSuperAdminUser(user) &&
+    user.role !== "admin" &&
+    !isSubscriptionEffective(user) &&
+    !ALLOWED_WHEN_EXPIRED.has(seg)
+  ) {
     return <Navigate to={createPageUrl("Pricing")} replace />;
   }
 

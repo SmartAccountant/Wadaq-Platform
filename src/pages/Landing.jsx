@@ -258,12 +258,9 @@ export default function Landing() {
       {/* الأسئلة الشائعة — أسفل الصفحة */}
       <section className="py-14 px-4 sm:px-6 border-t bg-white/90" style={{ borderColor: "rgba(26,58,92,0.08)" }}>
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-black text-center mb-2" style={{ color: NAVY }}>
+          <h2 className="text-2xl font-black text-center mb-10" style={{ color: NAVY }}>
             الأسئلة الشائعة
           </h2>
-          <p className="text-center text-sm text-slate-600 mb-10 max-w-xl mx-auto leading-relaxed">
-            إجابات موجزة ضمن الإطار الرسمي للمعلومات المتعلقة بمنصّة ودق المحاسبي والمتطلبات النظامية والمهنية في المملكة العربية السعودية.
-          </p>
           <div className="space-y-2">
             {faqs.map((faq, i) => (
               <div

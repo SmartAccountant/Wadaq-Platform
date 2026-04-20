@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 export default function AdminUsage() {
   const { language } = useLanguage();
@@ -24,8 +25,7 @@ export default function AdminUsage() {
     queryFn: async () => {
       const currentUser = await Wadaq.auth.me();
       
-      // Only allow admin access
-      if (currentUser.role !== 'admin') {
+      if (!isSuperAdminUser(currentUser)) {
         throw new Error('Unauthorized');
       }
       

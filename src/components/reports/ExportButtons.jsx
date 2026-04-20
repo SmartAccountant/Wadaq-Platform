@@ -1,17 +1,42 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Download, FileSpreadsheet, Loader2, FileText, Mail } from "lucide-react";
 import * as XLSX from "xlsx";
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import { ar } from "date-fns/locale";
 import { useLanguage } from "@/components/LanguageContext";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { Wadaq } from "@/api/WadaqCore";
 
+function formatReportDateForDocument(isoDate, language) {
+  const d = parseISO(isoDate);
+  if (!isValid(d)) return isoDate;
+  return language === "ar"
+    ? format(d, "d MMMM yyyy", { locale: ar })
+    : format(d, "MMMM d, yyyy");
+}
+
+function prependNoteRowToDetails(dataRows, reportDateIso, language) {
+  if (!dataRows.length) return dataRows;
+  const keys = Object.keys(dataRows[0]);
+  const label = formatReportDateForDocument(reportDateIso, language);
+  const row = keys.reduce((acc, k) => {
+    acc[k] = "";
+    return acc;
+  }, {});
+  row[keys[0]] = language === "ar" ? `تاريخ التقرير: ${label}` : `Report date: ${label}`;
+  return [row, ...dataRows];
+}
+
 export default function ExportButtons({ invoices, expenses, period }) {
   const [isExporting, setIsExporting] = useState(false);
+  const [reportDocumentDate, setReportDocumentDate] = useState(() => format(new Date(), "yyyy-MM-dd"));
   const { language } = useLanguage();
+
+  const reportDateLabel = formatReportDateForDocument(reportDocumentDate, language);
 
   const exportSalesReport = () => {
     setIsExporting(true);
@@ -38,10 +63,15 @@ export default function ExportButtons({ invoices, expenses, period }) {
         .filter(inv => inv.status === "sent" || inv.status === "draft")
         .reduce((sum, inv) => sum + (inv.total || 0), 0);
 
+      const itemKey = language === 'ar' ? "البيان" : "Item";
+      const amountKey = language === 'ar' ? "المبلغ" : "Amount";
+      const periodLabel = getPeriodLabel(period);
       const summary = [
-        { [language === 'ar' ? "البيان" : "Item"]: language === 'ar' ? "إجمالي المبيعات المدفوعة" : "Total Paid Sales", [language === 'ar' ? "المبلغ" : "Amount"]: totalSales },
-        { [language === 'ar' ? "البيان" : "Item"]: language === 'ar' ? "المبيعات المعلقة" : "Pending Sales", [language === 'ar' ? "المبلغ" : "Amount"]: pendingSales },
-        { [language === 'ar' ? "البيان" : "Item"]: language === 'ar' ? "عدد الفواتير" : "Number of Invoices", [language === 'ar' ? "المبلغ" : "Amount"]: invoices.length },
+        { [itemKey]: language === 'ar' ? "تاريخ التقرير" : "Report date", [amountKey]: reportDateLabel },
+        { [itemKey]: language === 'ar' ? "نوع فترة التقرير" : "Report period type", [amountKey]: periodLabel },
+        { [itemKey]: language === 'ar' ? "إجمالي المبيعات المدفوعة" : "Total Paid Sales", [amountKey]: totalSales },
+        { [itemKey]: language === 'ar' ? "المبيعات المعلقة" : "Pending Sales", [amountKey]: pendingSales },
+        { [itemKey]: language === 'ar' ? "عدد الفواتير" : "Number of Invoices", [amountKey]: invoices.length },
       ];
 
       // Create workbook
@@ -52,14 +82,15 @@ export default function ExportButtons({ invoices, expenses, period }) {
       XLSX.utils.book_append_sheet(wb, summarySheet, language === 'ar' ? "الملخص" : "Summary");
       
       // Add details sheet
-      const detailsSheet = XLSX.utils.json_to_sheet(salesData);
+      const detailsSheet = XLSX.utils.json_to_sheet(
+        prependNoteRowToDetails(salesData, reportDocumentDate, language)
+      );
       XLSX.utils.book_append_sheet(wb, detailsSheet, language === 'ar' ? "التفاصيل" : "Details");
 
       // Export
-      const periodLabel = getPeriodLabel(period);
       const fileName = language === 'ar' 
-        ? `تقرير_المبيعات_${periodLabel}_${format(new Date(), "yyyy-MM-dd")}.xlsx`
-        : `Sales_Report_${periodLabel}_${format(new Date(), "yyyy-MM-dd")}.xlsx`;
+        ? `تقرير_المبيعات_${periodLabel}_${reportDocumentDate}.xlsx`
+        : `Sales_Report_${periodLabel}_${reportDocumentDate}.xlsx`;
       XLSX.writeFile(wb, fileName);
     } catch (error) {
       console.error("Error exporting sales report:", error);
@@ -100,22 +131,32 @@ export default function ExportButtons({ invoices, expenses, period }) {
         [language === 'ar' ? "المبلغ" : "Amount"]: totalExpenses 
       });
 
+      const catKey = language === 'ar' ? "التصنيف" : "Category";
+      const amountKeyEx = language === 'ar' ? "المبلغ" : "Amount";
+      const periodLabelEx = getPeriodLabel(period);
+      const categorySummaryWithMeta = [
+        { [catKey]: language === 'ar' ? "تاريخ التقرير" : "Report date", [amountKeyEx]: reportDateLabel },
+        { [catKey]: language === 'ar' ? "نوع فترة التقرير" : "Report period type", [amountKeyEx]: periodLabelEx },
+        ...categorySummary,
+      ];
+
       // Create workbook
       const wb = XLSX.utils.book_new();
       
       // Add summary sheet
-      const summarySheet = XLSX.utils.json_to_sheet(categorySummary);
+      const summarySheet = XLSX.utils.json_to_sheet(categorySummaryWithMeta);
       XLSX.utils.book_append_sheet(wb, summarySheet, language === 'ar' ? "الملخص" : "Summary");
       
       // Add details sheet
-      const detailsSheet = XLSX.utils.json_to_sheet(expensesData);
+      const detailsSheet = XLSX.utils.json_to_sheet(
+        prependNoteRowToDetails(expensesData, reportDocumentDate, language)
+      );
       XLSX.utils.book_append_sheet(wb, detailsSheet, language === 'ar' ? "التفاصيل" : "Details");
 
       // Export
-      const periodLabel = getPeriodLabel(period);
       const fileName = language === 'ar'
-        ? `تقرير_المصروفات_${periodLabel}_${format(new Date(), "yyyy-MM-dd")}.xlsx`
-        : `Expenses_Report_${periodLabel}_${format(new Date(), "yyyy-MM-dd")}.xlsx`;
+        ? `تقرير_المصروفات_${periodLabelEx}_${reportDocumentDate}.xlsx`
+        : `Expenses_Report_${periodLabelEx}_${reportDocumentDate}.xlsx`;
       XLSX.writeFile(wb, fileName);
     } catch (error) {
       console.error("Error exporting expenses report:", error);
@@ -137,10 +178,15 @@ export default function ExportButtons({ invoices, expenses, period }) {
       const totalExpenses = expenses.reduce((sum, exp) => sum + (exp.amount || 0), 0);
       const netProfit = totalSales - totalExpenses;
 
+      const itemKeyF = language === 'ar' ? "البيان" : "Item";
+      const amountKeyF = language === 'ar' ? "المبلغ" : "Amount";
+      const periodLabelF = getPeriodLabel(period);
       const summary = [
-        { [language === 'ar' ? "البيان" : "Item"]: language === 'ar' ? "إجمالي المبيعات" : "Total Sales", [language === 'ar' ? "المبلغ" : "Amount"]: totalSales },
-        { [language === 'ar' ? "البيان" : "Item"]: language === 'ar' ? "إجمالي المصروفات" : "Total Expenses", [language === 'ar' ? "المبلغ" : "Amount"]: totalExpenses },
-        { [language === 'ar' ? "البيان" : "Item"]: language === 'ar' ? "صافي الربح" : "Net Profit", [language === 'ar' ? "المبلغ" : "Amount"]: netProfit },
+        { [itemKeyF]: language === 'ar' ? "تاريخ التقرير" : "Report date", [amountKeyF]: reportDateLabel },
+        { [itemKeyF]: language === 'ar' ? "نوع فترة التقرير" : "Report period type", [amountKeyF]: periodLabelF },
+        { [itemKeyF]: language === 'ar' ? "إجمالي المبيعات" : "Total Sales", [amountKeyF]: totalSales },
+        { [itemKeyF]: language === 'ar' ? "إجمالي المصروفات" : "Total Expenses", [amountKeyF]: totalExpenses },
+        { [itemKeyF]: language === 'ar' ? "صافي الربح" : "Net Profit", [amountKeyF]: netProfit },
       ];
 
       const summarySheet = XLSX.utils.json_to_sheet(summary);
@@ -153,7 +199,9 @@ export default function ExportButtons({ invoices, expenses, period }) {
         [language === 'ar' ? "العميل" : "Customer"]: inv.customer_name,
         [language === 'ar' ? "الإجمالي" : "Total"]: inv.total || 0,
       }));
-      const salesSheet = XLSX.utils.json_to_sheet(salesData);
+      const salesSheet = XLSX.utils.json_to_sheet(
+        prependNoteRowToDetails(salesData, reportDocumentDate, language)
+      );
       XLSX.utils.book_append_sheet(wb, salesSheet, language === 'ar' ? "المبيعات" : "Sales");
 
       // Expenses
@@ -163,13 +211,14 @@ export default function ExportButtons({ invoices, expenses, period }) {
         [language === 'ar' ? "التصنيف" : "Category"]: getCategoryLabel(exp.category),
         [language === 'ar' ? "المبلغ" : "Amount"]: exp.amount || 0,
       }));
-      const expensesSheet = XLSX.utils.json_to_sheet(expensesData);
+      const expensesSheet = XLSX.utils.json_to_sheet(
+        prependNoteRowToDetails(expensesData, reportDocumentDate, language)
+      );
       XLSX.utils.book_append_sheet(wb, expensesSheet, language === 'ar' ? "المصروفات" : "Expenses");
 
-      const periodLabel = getPeriodLabel(period);
       const fileName = language === 'ar'
-        ? `التقرير_الشامل_${periodLabel}_${format(new Date(), "yyyy-MM-dd")}.xlsx`
-        : `Full_Report_${periodLabel}_${format(new Date(), "yyyy-MM-dd")}.xlsx`;
+        ? `التقرير_الشامل_${periodLabelF}_${reportDocumentDate}.xlsx`
+        : `Full_Report_${periodLabelF}_${reportDocumentDate}.xlsx`;
       XLSX.writeFile(wb, fileName);
     } catch (error) {
       console.error("Error exporting full report:", error);
@@ -278,7 +327,7 @@ export default function ExportButtons({ invoices, expenses, period }) {
           <h1 style="font-size:28px; font-weight:700; color:#6d28d9; margin:0;">
             ${isAr ? 'التقرير المالي الشامل' : 'Financial Report'}
           </h1>
-          <p style="color:#64748b; margin-top:8px; font-size:14px;">${format(new Date(), 'yyyy-MM-dd')}</p>
+          <p style="color:#64748b; margin-top:8px; font-size:14px;">${isAr ? 'تاريخ التقرير:' : 'Report date:'} <strong>${reportDateLabel}</strong></p>
         </div>
 
         <h2 style="font-size:18px; color:#1e40af; margin-bottom:12px;">${isAr ? 'الملخص المالي' : 'Financial Summary'}</h2>
@@ -339,10 +388,10 @@ export default function ExportButtons({ invoices, expenses, period }) {
         heightLeft -= pageHeight;
       }
 
-      const periodLabel = getPeriodLabel(period);
+      const periodLabelPdf = getPeriodLabel(period);
       const fileName = isAr
-        ? `التقرير_المالي_${periodLabel}_${format(new Date(), "yyyy-MM-dd")}.pdf`
-        : `Financial_Report_${periodLabel}_${format(new Date(), "yyyy-MM-dd")}.pdf`;
+        ? `التقرير_المالي_${periodLabelPdf}_${reportDocumentDate}.pdf`
+        : `Financial_Report_${periodLabelPdf}_${reportDocumentDate}.pdf`;
       doc.save(fileName);
     } catch (error) {
       console.error("Error exporting PDF report:", error);
@@ -369,7 +418,7 @@ export default function ExportButtons({ invoices, expenses, period }) {
         <div dir="rtl" style="font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5;">
           <div style="background: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #1e40af; border-bottom: 3px solid #3b82f6; padding-bottom: 10px;">التقرير المالي</h2>
-            <p style="color: #666;">التاريخ: ${format(new Date(), 'yyyy-MM-dd')}</p>
+            <p style="color: #666;">تاريخ التقرير: ${reportDateLabel}</p>
             
             <div style="margin: 30px 0;">
               <h3 style="color: #047857; margin-bottom: 15px;">الملخص المالي</h3>
@@ -405,7 +454,7 @@ export default function ExportButtons({ invoices, expenses, period }) {
         <div style="font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5;">
           <div style="background: white; padding: 30px; border-radius: 10px; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #1e40af; border-bottom: 3px solid #3b82f6; padding-bottom: 10px;">Financial Report</h2>
-            <p style="color: #666;">Date: ${format(new Date(), 'yyyy-MM-dd')}</p>
+            <p style="color: #666;">Report date: ${reportDateLabel}</p>
             
             <div style="margin: 30px 0;">
               <h3 style="color: #047857; margin-bottom: 15px;">Financial Summary</h3>
@@ -455,7 +504,22 @@ export default function ExportButtons({ invoices, expenses, period }) {
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-col gap-3 w-full sm:w-auto">
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="space-y-1.5 min-w-[200px]">
+          <Label htmlFor="report-document-date" className="text-sm text-slate-600">
+            {language === "ar" ? "تاريخ التقرير (في الملف والـ PDF)" : "Report date (in file & PDF)"}
+          </Label>
+          <Input
+            id="report-document-date"
+            type="date"
+            value={reportDocumentDate}
+            onChange={(e) => setReportDocumentDate(e.target.value)}
+            className="w-full max-w-[220px] bg-white"
+          />
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2">
       <Button 
         onClick={exportSalesReport} 
         disabled={isExporting || invoices.length === 0}
@@ -524,6 +588,7 @@ export default function ExportButtons({ invoices, expenses, period }) {
         )}
         {language === 'ar' ? 'إرسال بالإيميل' : 'Email Report'}
       </Button>
+      </div>
     </div>
   );
 }

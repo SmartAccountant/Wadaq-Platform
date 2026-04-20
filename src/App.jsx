@@ -11,10 +11,11 @@ import AuthSubscriptionLayout from "@/components/auth/AuthSubscriptionLayout";
 import GuestOnly from "@/components/auth/GuestOnly";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
-import AdminPanel from "@/pages/AdminPanel";
+import AdminConsole from "@/pages/AdminConsole";
 import AdminSettings from "@/pages/AdminSettings";
 import AdminPaymentSettings from "@/pages/AdminPaymentSettings";
 import AdminPaymentLogs from "@/pages/AdminPaymentLogs";
+import SuperAdminGate from "@/components/auth/SuperAdminGate";
 import PaymentInvoice from "@/pages/PaymentInvoice";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import About from "@/pages/About";
@@ -63,8 +64,8 @@ function AppRoutes() {
       <Route path="/pricing" element={<Navigate to="/Pricing" replace />} />
 
       {/* أسماء شائعة لصفحة الإدارة — المسار الفعلي /admin/settings */}
-      <Route path="/Administration" element={<Navigate to="/admin/settings" replace />} />
-      <Route path="/administration" element={<Navigate to="/admin/settings" replace />} />
+      <Route path="/Administration" element={<Navigate to="/admin" replace />} />
+      <Route path="/administration" element={<Navigate to="/admin" replace />} />
       <Route path="/Admin" element={<Navigate to="/admin" replace />} />
 
       <Route element={<AuthSubscriptionLayout />}>
@@ -74,10 +75,38 @@ function AppRoutes() {
         {/* بوابة الدفع — مسار واحد بأحرف صغيرة؛ التوافق مع الروابط القديمة /Checkout */}
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/Checkout" element={<Navigate to="/checkout" replace />} />
-        <Route path="/admin" element={<AdminPanel />} />
-        <Route path="/admin/settings" element={<AdminSettings />} />
-        <Route path="/admin/payment-settings" element={<AdminPaymentSettings />} />
-        <Route path="/admin/payment-logs" element={<AdminPaymentLogs />} />
+        <Route
+          path="/admin"
+          element={
+            <SuperAdminGate>
+              <AdminConsole />
+            </SuperAdminGate>
+          }
+        />
+        <Route
+          path="/admin/settings"
+          element={
+            <SuperAdminGate>
+              <AdminSettings />
+            </SuperAdminGate>
+          }
+        />
+        <Route
+          path="/admin/payment-settings"
+          element={
+            <SuperAdminGate>
+              <AdminPaymentSettings />
+            </SuperAdminGate>
+          }
+        />
+        <Route
+          path="/admin/payment-logs"
+          element={
+            <SuperAdminGate>
+              <AdminPaymentLogs />
+            </SuperAdminGate>
+          }
+        />
         <Route path="/PaymentInvoice" element={<PaymentInvoice />} />
       </Route>
 

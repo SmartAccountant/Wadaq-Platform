@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Receipt, Search } from "lucide-react";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 export default function AdminPaymentLogs() {
   const { user } = useAuth();
@@ -40,7 +41,7 @@ export default function AdminPaymentLogs() {
     );
   }, [logs, q]);
 
-  if (user?.role !== "admin") {
+  if (!isSuperAdminUser(user)) {
     return <Navigate to="/Dashboard" replace />;
   }
 

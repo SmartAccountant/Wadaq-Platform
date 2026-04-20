@@ -9,6 +9,7 @@ import { Copy, Eye, EyeOff, RefreshCw, Key, CheckCircle2, AlertCircle, CreditCar
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/components/LanguageContext";
 import { Badge } from "@/components/ui/badge";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 export default function APISettings() {
   const { language } = useLanguage();
@@ -22,7 +23,7 @@ export default function APISettings() {
     queryKey: ["currentUser"],
     queryFn: async () => {
       const userData = await Wadaq.auth.me();
-      if (userData.role !== 'admin') {
+      if (!isSuperAdminUser(userData)) {
         window.location.href = '/Dashboard';
         throw new Error('Unauthorized');
       }

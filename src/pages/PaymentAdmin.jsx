@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Shield, Key, CreditCard, Loader2, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 export default function PaymentAdmin() {
   const { language } = useLanguage();
@@ -21,7 +22,7 @@ export default function PaymentAdmin() {
   useEffect(() => {
     Wadaq.auth.me()
       .then((userData) => {
-        if (userData.role !== 'admin') {
+        if (!isSuperAdminUser(userData)) {
           window.location.href = '/Dashboard';
           return;
         }
@@ -61,7 +62,7 @@ export default function PaymentAdmin() {
     );
   }
 
-  if (!user || user.role !== 'admin') {
+  if (!user || !isSuperAdminUser(user)) {
     return null;
   }
 

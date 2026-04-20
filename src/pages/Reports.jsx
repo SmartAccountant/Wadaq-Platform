@@ -583,7 +583,7 @@ function ReportsContent() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <h3 className="font-medium text-gray-900">{language === 'ar' ? 'تصدير التقارير' : 'Export Reports'}</h3>
-                <p className="text-sm text-gray-600 font-light">{language === 'ar' ? 'قم بتحميل التقارير بصيغة Excel' : 'Download reports in Excel format'}</p>
+                <p className="text-sm text-gray-600 font-light">{language === 'ar' ? 'عيّن تاريخ التقرير ثم نزّل Excel أو PDF' : 'Set the report date, then download Excel or PDF'}</p>
               </div>
               <ExportButtons 
                 invoices={filteredInvoices} 

@@ -5,6 +5,7 @@ import { Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "../../utils";
 import { useLanguage } from "@/components/LanguageContext";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 export default function SubscriptionGuard({ children }) {
   const [user, setUser] = useState(null);
@@ -49,7 +50,7 @@ export default function SubscriptionGuard({ children }) {
     );
   }
 
-  if (user?.role === 'admin') return <>{children}</>;
+  if (isSuperAdminUser(user) || user?.role === 'admin') return <>{children}</>;
 
   const hasAccess = user?.subscription_status && user.subscription_status !== 'expired';
 

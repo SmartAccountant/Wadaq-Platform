@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
 import { MapPin, FileText, Mail, Phone, Lock } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Terms from "@/pages/Terms";
@@ -94,16 +93,6 @@ export default function WadaqFooter() {
                     </button>
                   </li>
                 ))}
-                <li className="pt-2 border-t border-white/10 mt-2">
-                  <Link
-                    to="/checkout"
-                    className={cn(
-                      "block w-full text-start text-amber-200/90 hover:text-amber-100 text-sm font-semibold py-1"
-                    )}
-                  >
-                    {t("footer_checkout_link")}
-                  </Link>
-                </li>
               </ul>
             </div>
 

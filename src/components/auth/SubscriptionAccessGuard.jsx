@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { createPageUrl } from "@/utils";
 import { canAccessPage, getEffectivePlanId } from "@/lib/subscriptionAccess";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShieldAlert } from "lucide-react";
@@ -15,7 +16,7 @@ export default function SubscriptionAccessGuard({ pageName, children }) {
   const { user } = useAuth();
   const { t, isRTL } = useLanguage();
 
-  if (!user || user.role === "admin") return children;
+  if (!user || isSuperAdminUser(user) || user.role === "admin") return children;
 
   if (canAccessPage(user, pageName)) return children;
 

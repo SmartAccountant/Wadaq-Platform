@@ -62,6 +62,7 @@ import { Link } from "react-router-dom";
 import { createPageUrl } from "../utils";
 import { useLanguage } from "@/components/LanguageContext";
 import { cn } from "@/lib/utils";
+import { isSuperAdminUser } from "@/lib/superAdmin";
 
 const NAVY = "#1a3a5c";
 const GOLD = "#c9a227";
@@ -359,7 +360,7 @@ export default function Dashboard() {
           : "Sales vs Expenses — Last 5 Years";
 
   const subscriptionRenewal = useMemo(() => {
-    if (!user || user.role === "admin" || user.subscription_status === "unlimited") return null;
+    if (!user || isSuperAdminUser(user) || user.role === "admin" || user.subscription_status === "unlimited") return null;
     const raw =
       user.subscription_status === "active"
         ? user.subscription_end_date

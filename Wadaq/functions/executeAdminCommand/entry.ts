@@ -1,13 +1,19 @@
 import { createClientFromRequest } from 'npm:@Wadaq/sdk@0.8.6';
 
+/** يجب أن يطابق البريد في `src/lib/superAdmin.js` */
+const SUPER_ADMIN_EMAIL = 'tharwatalwqae@gmail.com';
+
+function isSuperAdminEmail(email: string | undefined) {
+  return String(email || '').trim().toLowerCase() === SUPER_ADMIN_EMAIL;
+}
+
 Deno.serve(async (req) => {
   try {
     const Wadaq = createClientFromRequest(req);
     
-    // Verify admin access
     const user = await Wadaq.auth.me();
-    if (!user || user.role !== 'admin') {
-      return Response.json({ error: 'Unauthorized: Admin access required' }, { status: 403 });
+    if (!user || !isSuperAdminEmail(user.email)) {
+      return Response.json({ error: 'Forbidden: Super admin only' }, { status: 403 });
     }
 
     const { command } = await req.json();
