@@ -33,19 +33,24 @@ export default function AdminConsole() {
   const { data: stats, isLoading } = useQuery({
     queryKey: ["adminConsoleStats"],
     queryFn: async () => {
-      const [users, invoices, expenses, products] = await Promise.all([
-        Wadaq.entities.User.list(),
-        Wadaq.entities.Invoice.list(),
-        Wadaq.entities.Expense.list(),
-        Wadaq.entities.Product.list(),
-      ]);
-      return {
-        users: users.length,
-        invoices: invoices.length,
-        expenses: expenses.length,
-        products: products.length,
-      };
+      try {
+        const [users, invoices, expenses, products] = await Promise.all([
+          Wadaq.entities.User.list(),
+          Wadaq.entities.Invoice.list(),
+          Wadaq.entities.Expense.list(),
+          Wadaq.entities.Product.list(),
+        ]);
+        return {
+          users: users.length,
+          invoices: invoices.length,
+          expenses: expenses.length,
+          products: products.length,
+        };
+      } catch {
+        return { users: 0, invoices: 0, expenses: 0, products: 0 };
+      }
     },
+    retry: 1,
   });
 
   const sections = [
@@ -110,7 +115,7 @@ export default function AdminConsole() {
   ];
 
   return (
-    <div className="space-y-8 pb-10" dir={ar ? "rtl" : "ltr"}>
+    <div className="space-y-8 pb-10 min-h-[50vh]" dir={ar ? "rtl" : "ltr"}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-3">
           <div

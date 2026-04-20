@@ -9,12 +9,24 @@ import { Button } from "@/components/ui/button";
 import { ShieldAlert } from "lucide-react";
 import { useLanguage } from "@/components/LanguageContext";
 
+/** مسارات الإدارة — يُسمح بالمرور للواجهة؛ `SuperAdminGate` يفرض البريد/الصلاحية */
+const ADMIN_APP_PATHS = new Set([
+  "admin",
+  "admin-settings",
+  "admin-payment-settings",
+  "admin-payment-logs",
+]);
+
 /**
  * يمنع عرض صفحات خارج باقة المستخدم (بعد الدفع). التجربة ترى كل القوائم.
  */
 export default function SubscriptionAccessGuard({ pageName, children }) {
   const { user } = useAuth();
   const { t, isRTL } = useLanguage();
+
+  if (pageName && ADMIN_APP_PATHS.has(pageName)) {
+    return children;
+  }
 
   if (!user || isSuperAdminUser(user) || user.role === "admin") return children;
 
