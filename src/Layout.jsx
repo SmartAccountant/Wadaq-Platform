@@ -216,10 +216,6 @@ function LayoutContent({ children, currentPageName }) {
   }, [currentPageLabel, t]);
 
   React.useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  React.useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPageName]);
 

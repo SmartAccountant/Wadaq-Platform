@@ -11,6 +11,7 @@ import CustomerDetails from "@/components/customers/CustomerDetails";
 import { useLanguage } from "@/components/LanguageContext";
 import Swal from "sweetalert2";
 import SubscriptionGuard from "@/components/auth/SubscriptionGuard";
+import { toast } from "@/components/ui/use-toast";
 
 function CustomersContent() {
   const { language } = useLanguage();
@@ -38,10 +39,41 @@ function CustomersContent() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => Wadaq.entities.Customer.create(data),
+    mutationFn: async (data) => {
+      const user = await Wadaq.auth.me();
+      if (!user?.email) {
+        throw new Error(
+          language === "ar" ? "يجب تسجيل الدخول لحفظ العميل." : "Please sign in to save the customer."
+        );
+      }
+      return Wadaq.entities.Customer.create({
+        ...data,
+        created_by: user.email,
+        created_date: new Date().toISOString(),
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["customers"] });
       setView("list");
+      toast({
+        title: language === "ar" ? "تم الحفظ" : "Saved",
+        description:
+          language === "ar"
+            ? "تم حفظ بيانات العميل ويظهر في القائمة."
+            : "Customer saved and appears in the list.",
+      });
+    },
+    onError: (error) => {
+      console.error("Customer create error:", error);
+      toast({
+        variant: "destructive",
+        title: language === "ar" ? "فشل الحفظ" : "Save failed",
+        description:
+          error?.message ||
+          (language === "ar"
+            ? "تعذّر حفظ العميل. تحقق من البيانات وحاول مجدداً."
+            : "Could not save the customer. Check the data and try again."),
+      });
     },
   });
 

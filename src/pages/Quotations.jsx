@@ -12,6 +12,7 @@ import { useLanguage } from "@/components/LanguageContext";
 import QuotationForm from "@/components/quotations/QuotationForm";
 import QuotationView from "@/components/quotations/QuotationView";
 import PlanGuard from "@/components/auth/PlanGuard";
+import { toast } from "@/components/ui/use-toast";
 
 function QuotationsContent() {
   const { language } = useLanguage();
@@ -63,19 +64,77 @@ function QuotationsContent() {
   });
 
   const createQuotationMutation = useMutation({
-    mutationFn: (data) => Wadaq.entities.Quotation.create(data),
+    mutationFn: async (data) => {
+      const user = await Wadaq.auth.me();
+      if (!user?.email) {
+        throw new Error(language === "ar" ? "يجب تسجيل الدخول لحفظ عرض السعر." : "Please sign in to save the quotation.");
+      }
+      const sanitizedItems = (data.items || []).map((item) => ({
+        ...item,
+        product_name: item.product_name || (language === "ar" ? "بند" : "Item"),
+      }));
+      return Wadaq.entities.Quotation.create({
+        ...data,
+        items: sanitizedItems,
+        created_by: user.email,
+        created_date: new Date().toISOString(),
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['quotations'] });
+      queryClient.invalidateQueries({ queryKey: ["quotations"] });
       setView("list");
       setSelectedQuotation(null);
+      toast({
+        title: language === "ar" ? "تم الحفظ" : "Saved",
+        description:
+          language === "ar"
+            ? "تم حفظ عرض السعر ويظهر الآن في القائمة."
+            : "Quotation saved and appears in the list.",
+      });
+    },
+    onError: (error) => {
+      console.error("Quotation create error:", error);
+      toast({
+        variant: "destructive",
+        title: language === "ar" ? "فشل الحفظ" : "Save failed",
+        description:
+          error?.message ||
+          (language === "ar"
+            ? "تعذّر حفظ عرض السعر. تحقق من الاتصال والبيانات وحاول مجدداً."
+            : "Could not save the quotation. Check your connection and data, then try again."),
+      });
     },
   });
 
   const createCustomerMutation = useMutation({
-    mutationFn: (data) => Wadaq.entities.Customer.create(data),
+    mutationFn: async (data) => {
+      const user = await Wadaq.auth.me();
+      if (!user?.email) {
+        throw new Error(
+          language === "ar" ? "يجب تسجيل الدخول لإضافة العميل." : "Please sign in to add the customer."
+        );
+      }
+      return Wadaq.entities.Customer.create({
+        ...data,
+        created_by: user.email,
+        created_date: new Date().toISOString(),
+      });
+    },
     onSuccess: (newCustomer) => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
       return newCustomer;
+    },
+    onError: (error) => {
+      console.error("Customer create (quotation) error:", error);
+      toast({
+        variant: "destructive",
+        title: language === "ar" ? "فشل إضافة العميل" : "Could not add customer",
+        description:
+          error?.message ||
+          (language === "ar"
+            ? "تعذّر حفظ العميل. تحقق من البيانات وحاول مجدداً."
+            : "Could not save the customer. Check the data and try again."),
+      });
     },
   });
 

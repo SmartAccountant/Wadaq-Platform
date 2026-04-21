@@ -5,6 +5,7 @@ import { createPageUrl } from "@/utils";
 import { isSuperAdminUser } from "@/lib/superAdmin";
 import __Layout from "@/Layout.jsx";
 
+/** مسموح بدون اشتراك فعّال — بما فيها مسارات الإدارة حتى يصل المستخدم لبوابة المسؤول ويرى رسالة واضحة */
 const ALLOWED_WHEN_EXPIRED = new Set([
   "Pricing",
   "Subscription",
@@ -12,6 +13,10 @@ const ALLOWED_WHEN_EXPIRED = new Set([
   "Checkout",
   "checkout",
   "PaymentInvoice",
+  "admin",
+  "admin-settings",
+  "admin-payment-settings",
+  "admin-payment-logs",
 ]);
 
 function pathSegment(pathname) {

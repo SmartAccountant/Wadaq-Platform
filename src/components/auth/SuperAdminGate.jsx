@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { createPageUrl } from "@/utils";
-import { isSuperAdminUser } from "@/lib/superAdmin";
+import { getPrimarySuperAdminEmail, isSuperAdminUser } from "@/lib/superAdmin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,7 +37,15 @@ export default function SuperAdminGate({ children }) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-slate-700">
-            <p>هذه المنطقة مخصّصة لمسؤول المنصّة فقط.</p>
+            <p>هذه المنطقة مخصّصة لمسؤول المنصّة فقط (البريد المصرّح به لا يطابق حسابك الحالي).</p>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              يمكن ربط بريدك بإضافة{" "}
+              <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[10px]">
+                VITE_SUPER_ADMIN_EMAIL
+              </code>{" "}
+              في ملف <code className="font-mono text-[10px]">.env</code> ثم إعادة بناء التطبيق. المرجع الحالي:{" "}
+              <span className="font-mono text-[10px]">{getPrimarySuperAdminEmail()}</span>
+            </p>
             <p className="text-sm text-slate-500">
               Unauthorized — super admin access only.
             </p>
