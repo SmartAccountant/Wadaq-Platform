@@ -67,7 +67,8 @@ function VouchersContent() {
           account_name: language === 'ar' ? 'الخزينة الرئيسية' : 'Main Cash',
           account_type: 'cash',
           balance: 0,
-          initial_balance: 0
+          initial_balance: 0,
+          created_by: user.email,
         });
         const user2 = await Wadaq.auth.me();
         return Wadaq.entities.CashAccount.filter({ created_by: user2.email });
@@ -77,7 +78,11 @@ function VouchersContent() {
   });
 
   const createPaymentMutation = useMutation({
-    mutationFn: (data) => Wadaq.entities.PaymentVoucher.create(data),
+    mutationFn: async (data) => {
+      const user = await Wadaq.auth.me();
+      if (!user?.email) throw new Error(language === "ar" ? "يجب تسجيل الدخول" : "Login required");
+      return Wadaq.entities.PaymentVoucher.create({ ...data, created_by: user.email });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["paymentVouchers"] });
       setShowPaymentForm(false);
@@ -85,7 +90,11 @@ function VouchersContent() {
   });
 
   const createReceiptMutation = useMutation({
-    mutationFn: (data) => Wadaq.entities.ReceiptVoucher.create(data),
+    mutationFn: async (data) => {
+      const user = await Wadaq.auth.me();
+      if (!user?.email) throw new Error(language === "ar" ? "يجب تسجيل الدخول" : "Login required");
+      return Wadaq.entities.ReceiptVoucher.create({ ...data, created_by: user.email });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["receiptVouchers"] });
       setShowReceiptForm(false);

@@ -33,8 +33,11 @@ function JournalEntryForm({ entry, onClose }) {
 
   const mutation = useMutation({
     mutationFn: async () => {
+      const user = await Wadaq.auth.me();
+      if (!user?.email) throw new Error("يجب تسجيل الدخول");
       const payload = { ...form, total_debit: totalDebit, total_credit: totalCredit, lines: form.lines.map(l => ({ ...l, debit: parseFloat(l.debit) || 0, credit: parseFloat(l.credit) || 0 })) };
-      return entry ? Wadaq.entities.JournalEntry.update(entry.id, payload) : Wadaq.entities.JournalEntry.create(payload);
+      if (entry) return Wadaq.entities.JournalEntry.update(entry.id, payload);
+      return Wadaq.entities.JournalEntry.create({ ...payload, created_by: user.email });
     },
     onSuccess: () => { queryClient.invalidateQueries(["journal_entries"]); onClose(); }
   });

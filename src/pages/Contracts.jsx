@@ -28,8 +28,11 @@ function ContractForm({ contract, onClose }) {
 
   const mutation = useMutation({
     mutationFn: async () => {
+      const user = await Wadaq.auth.me();
+      if (!user?.email) throw new Error("يجب تسجيل الدخول");
       const payload = { ...form, value: parseFloat(form.value) || 0 };
-      return contract ? Wadaq.entities.Contract.update(contract.id, payload) : Wadaq.entities.Contract.create(payload);
+      if (contract) return Wadaq.entities.Contract.update(contract.id, payload);
+      return Wadaq.entities.Contract.create({ ...payload, created_by: user.email });
     },
     onSuccess: () => { queryClient.invalidateQueries(["contracts"]); onClose(); }
   });

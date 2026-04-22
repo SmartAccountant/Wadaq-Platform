@@ -48,7 +48,11 @@ function ExpensesContent() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => Wadaq.entities.Expense.create(data),
+    mutationFn: async (data) => {
+      const user = await Wadaq.auth.me();
+      if (!user?.email) throw new Error(language === "ar" ? "يجب تسجيل الدخول" : "Login required");
+      return Wadaq.entities.Expense.create({ ...data, created_by: user.email });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
       setView("list");

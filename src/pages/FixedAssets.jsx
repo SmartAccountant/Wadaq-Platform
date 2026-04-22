@@ -33,8 +33,11 @@ function AssetForm({ asset, onClose }) {
 
   const mutation = useMutation({
     mutationFn: async (data) => {
+      const user = await Wadaq.auth.me();
+      if (!user?.email) throw new Error("يجب تسجيل الدخول");
       const payload = { ...data, purchase_cost: parseFloat(data.purchase_cost) || 0, salvage_value: parseFloat(data.salvage_value) || 0, useful_life_years: parseFloat(data.useful_life_years) || 5, annual_depreciation: parseFloat(calcDepreciation()), current_value: parseFloat(data.purchase_cost) || 0 };
-      return asset ? Wadaq.entities.Asset.update(asset.id, payload) : Wadaq.entities.Asset.create(payload);
+      if (asset) return Wadaq.entities.Asset.update(asset.id, payload);
+      return Wadaq.entities.Asset.create({ ...payload, created_by: user.email });
     },
     onSuccess: () => { queryClient.invalidateQueries(["assets"]); onClose(); }
   });
