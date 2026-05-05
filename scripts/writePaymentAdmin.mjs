@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { Wadaq } from "@/api/WadaqCore";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Shield, Key, CreditCard, Loader2, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
-import { useLanguage } from "@/components/LanguageContext";
-import { isSuperAdminUser } from "@/lib/superAdmin";
+import { writeFileSync } from 'fs';
+
+const line1 = `import React, { useState, useEffect } from "react";`;
+const line2 = `import { Wadaq } from "@/api/WadaqCore";`;
+const line3 = `import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";`;
+const line4 = `import { Button } from "@/components/ui/button";`;
+const line5 = `import { Input } from "@/components/ui/input";`;
+const line6 = `import { Label } from "@/components/ui/label";`;
+const line7 = `import { Shield, Key, CreditCard, Loader2, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";`;
+const line8 = `import { useLanguage } from "@/components/LanguageContext";`;
+const line9 = `import { isSuperAdminUser } from "@/lib/superAdmin";`;
+
+const part1 = `
 const PS_ID = "ps-global";
 
 export default function PaymentAdmin() {
@@ -66,7 +70,9 @@ export default function PaymentAdmin() {
 
   if (loading) return <div className="flex items-center justify-center min-h-screen"><Loader2 className="w-12 h-12 animate-spin text-blue-500" /></div>;
   if (!user || !isSuperAdminUser(user)) return null;
+`;
 
+const part2 = `
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-3 mb-8">
@@ -84,7 +90,9 @@ export default function PaymentAdmin() {
           <p className="text-amber-300 font-semibold text-sm">⚠️ {language === "ar" ? "صفحة مقيدة للمسؤولين فقط" : "Admin Only Page"}</p>
         </CardContent>
       </Card>
+`;
 
+const part3 = `
       <Card className="bg-gradient-to-br from-slate-900/90 to-blue-900/30 border-2 border-blue-500/30">
         <CardHeader className="border-b border-white/10">
           <div className="flex items-center gap-3">
@@ -138,7 +146,11 @@ export default function PaymentAdmin() {
               ))}
             </div>
           </div>
+`;
 
+const neoleapUrl = "https://securepayments.neoleap.com.sa/mrchptl/merchant.htm";
+
+const part4 = `
           <div className="p-4 bg-slate-800/50 border border-slate-600/30 rounded-lg">
             <div className="flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-blue-400 mt-0.5" />
@@ -146,7 +158,7 @@ export default function PaymentAdmin() {
                 <p className="font-semibold text-white">{language === "ar" ? "معلومات التاجر" : "Merchant Info"}</p>
                 <p>Terminal ID: <span className="font-mono text-blue-300">PG336600</span></p>
                 <p>Merchant ID: <span className="font-mono text-blue-300">600003130</span></p>
-                <p>{language === "ar" ? "لوحة التاجر: " : "Merchant Panel: "}<a href="https://securepayments.neoleap.com.sa/mrchptl/merchant.htm" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">securepayments.neoleap.com.sa</a></p>
+                <p>{language === "ar" ? "لوحة التاجر: " : "Merchant Panel: "}<a href="${neoleapUrl}" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">securepayments.neoleap.com.sa</a></p>
               </div>
             </div>
           </div>
@@ -165,4 +177,10 @@ export default function PaymentAdmin() {
       </Card>
     </div>
   );
-}
+}`;
+
+const imports = [line1,line2,line3,line4,line5,line6,line7,line8,line9].join('\n');
+const content = imports + part1 + part2 + part3 + part4;
+
+writeFileSync('src/pages/PaymentAdmin.jsx', content, 'utf8');
+console.log('done - ' + content.split('\n').length + ' lines');
